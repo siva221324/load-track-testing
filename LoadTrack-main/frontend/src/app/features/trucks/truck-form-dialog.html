@@ -1,0 +1,50 @@
+<h2 mat-dialog-title>{{ isEdit ? 'Edit Truck' : 'Add Truck' }}</h2>
+
+<form [formGroup]="form" (ngSubmit)="save()">
+  <mat-dialog-content class="form-content">
+    <mat-form-field appearance="outline">
+      <mat-label>Truck Number</mat-label>
+      <input matInput formControlName="truckNumber" placeholder="e.g. TS-09-AB-1234" />
+      <mat-error *ngIf="form.controls.truckNumber.hasError('required')">Required</mat-error>
+      <mat-error *ngIf="form.controls.truckNumber.hasError('maxlength')">Max 20 characters</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Model</mat-label>
+      <input matInput formControlName="model" placeholder="e.g. Tata 1612" />
+      <mat-error *ngIf="form.controls.model.hasError('required')">Required</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Capacity (tons)</mat-label>
+      <input matInput type="number" step="0.1" min="0.01" formControlName="capacityTons" />
+      <mat-error *ngIf="form.controls.capacityTons.hasError('required')">Required</mat-error>
+      <mat-error *ngIf="form.controls.capacityTons.hasError('min')">Must be greater than zero</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Insurance Number</mat-label>
+      <input matInput formControlName="insuranceNumber" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>RC Number</mat-label>
+      <input matInput formControlName="rcNumber" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Status</mat-label>
+      <mat-select formControlName="status">
+        <mat-option *ngFor="let s of statuses" [value]="s">{{ s }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button type="button" mat-button (click)="cancel()" [disabled]="saving()">Cancel</button>
+    <button type="submit" mat-flat-button color="primary" [disabled]="form.invalid || saving()">
+      <mat-spinner *ngIf="saving()" diameter="18"></mat-spinner>
+      <span *ngIf="!saving()">{{ isEdit ? 'Update' : 'Add' }}</span>
+    </button>
+  </mat-dialog-actions>
+</form>

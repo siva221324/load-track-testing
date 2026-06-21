@@ -1,0 +1,109 @@
+<div class="login-shell" [style.--accent]="profile().accent">
+
+  <!-- ========== LEFT — Brand panel ========== -->
+  <aside class="brand-panel">
+    <div class="brand-logo">
+      <div class="logo-icon"><mat-icon>local_shipping</mat-icon></div>
+      <span>LoadTrack</span>
+    </div>
+
+    <div class="brand-content">
+      <h1>Move loads.<br/>Move smarter.</h1>
+      <p class="tagline">
+        Manage your sand-transport fleet end to end — trucks, drivers, dealers,
+        trips, payments, and receipts in one tidy place.
+      </p>
+      <ul class="brand-features">
+        <li><mat-icon>check_circle</mat-icon> Auto-calculated trip totals &amp; interest on overdue dues</li>
+        <li><mat-icon>check_circle</mat-icon> Role-based portals for Admin, Driver and Dealer</li>
+        <li><mat-icon>check_circle</mat-icon> One-click PDF receipts and Excel reports</li>
+        <li><mat-icon>check_circle</mat-icon> Real-time dashboard with monthly insights</li>
+      </ul>
+    </div>
+
+    <div class="brand-footer">© 2026 LoadTrack · Built with Spring Boot + Angular</div>
+  </aside>
+
+  <!-- ========== RIGHT — Form panel ========== -->
+  <section class="form-panel">
+    <mat-card class="login-card">
+      <div class="role-tabs">
+        <button type="button"
+                [class.active]="selectedRole() === 'ADMIN'"
+                (click)="selectRole('ADMIN')">
+          <mat-icon>admin_panel_settings</mat-icon>
+          <span>Admin</span>
+        </button>
+        <button type="button"
+                [class.active]="selectedRole() === 'DRIVER'"
+                (click)="selectRole('DRIVER')">
+          <mat-icon>badge</mat-icon>
+          <span>Driver</span>
+        </button>
+        <button type="button"
+                [class.active]="selectedRole() === 'DEALER'"
+                (click)="selectRole('DEALER')">
+          <mat-icon>storefront</mat-icon>
+          <span>Dealer</span>
+        </button>
+      </div>
+
+      <div class="role-header">
+        <mat-icon class="role-icon">{{ profile().icon }}</mat-icon>
+        <div class="role-text">
+          <h2>{{ profile().label }} Sign In</h2>
+          <p>{{ profile().helper }}</p>
+        </div>
+      </div>
+
+      <mat-card-content>
+        <form [formGroup]="form" (ngSubmit)="submit()" class="login-form">
+          <mat-form-field appearance="outline">
+            <mat-label>Username</mat-label>
+            <input matInput formControlName="username" autocomplete="username" autofocus />
+            <mat-error *ngIf="form.controls.username.hasError('required')">
+              Username is required
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Password</mat-label>
+            <input matInput
+                   formControlName="password"
+                   [type]="hidePassword() ? 'password' : 'text'"
+                   autocomplete="current-password" />
+            <button type="button" mat-icon-button matSuffix
+                    (click)="hidePassword.set(!hidePassword())"
+                    [attr.aria-label]="hidePassword() ? 'Show password' : 'Hide password'">
+              <mat-icon>{{ hidePassword() ? 'visibility' : 'visibility_off' }}</mat-icon>
+            </button>
+            <mat-error *ngIf="form.controls.password.hasError('required')">
+              Password is required
+            </mat-error>
+          </mat-form-field>
+
+          <div class="auth-link-row">
+            <a routerLink="/login/forgot-password">Forgot password?</a>
+          </div>
+
+          <button type="submit"
+                  mat-flat-button
+                  class="login-btn"
+                  [disabled]="form.invalid || loading()">
+            <mat-spinner *ngIf="loading()" diameter="20"></mat-spinner>
+            <span *ngIf="!loading()">Sign in as {{ profile().label }}</span>
+          </button>
+
+          <div class="auth-links" *ngIf="selectedRole() === 'ADMIN'">
+            <span>New admin?</span>
+            <a routerLink="/login/signup">Create an account</a>
+          </div>
+
+          <p class="login-hint">
+            Tabs above are visual cues — your actual role is determined from your username.
+          </p>
+        </form>
+      </mat-card-content>
+    </mat-card>
+  </section>
+</div>

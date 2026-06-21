@@ -1,0 +1,23 @@
+spring.application.name=backend
+
+# === Database ===
+# Copy this file to application.properties and fill in your real Neon credentials.
+# application.properties is gitignored; this .example file is committed as the template.
+spring.datasource.url=jdbc:postgresql://<your-neon-host>/<your-db>?sslmode=require
+spring.datasource.username=<your-neon-username>
+spring.datasource.password=<your-neon-password>
+spring.datasource.driver-class-name=org.postgresql.Driver
+
+# === JPA / Hibernate ===
+spring.jpa.database-platform=org.hibernate.dialect.PostgreSQLDialect
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true
+
+# === Server ===
+server.port=8080
+
+# === JWT ===
+# Generate a 32+ character random string. NEVER commit a real production secret.
+jwt.secret=<your-jwt-secret-32-chars-minimum>
+jwt.expiration-ms=86400000

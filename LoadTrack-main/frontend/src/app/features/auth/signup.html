@@ -1,0 +1,113 @@
+<div class="login-shell">
+
+  <!-- ========== LEFT — Brand panel ========== -->
+  <aside class="brand-panel">
+    <div class="brand-logo">
+      <div class="logo-icon"><mat-icon>local_shipping</mat-icon></div>
+      <span>LoadTrack</span>
+    </div>
+
+    <div class="brand-content">
+      <h1>Get started<br/>in 30 seconds.</h1>
+      <p class="tagline">
+        Create your admin account and start managing trucks, drivers, dealers,
+        and trips immediately. No credit card required.
+      </p>
+      <ul class="brand-features">
+        <li><mat-icon>check_circle</mat-icon> Full admin control over the fleet</li>
+        <li><mat-icon>check_circle</mat-icon> Onboard drivers &amp; dealers with auto-generated logins</li>
+        <li><mat-icon>check_circle</mat-icon> Track payments, dues, and overdue interest</li>
+        <li><mat-icon>check_circle</mat-icon> Export reports as PDF or Excel anytime</li>
+      </ul>
+    </div>
+
+    <div class="brand-footer">© 2026 LoadTrack · Built with Spring Boot + Angular</div>
+  </aside>
+
+  <!-- ========== RIGHT — Form panel ========== -->
+  <section class="form-panel">
+    <mat-card class="login-card">
+      <mat-card-header>
+        <mat-card-title>Create Admin Account</mat-card-title>
+        <mat-card-subtitle>Sign up to manage your LoadTrack fleet</mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-card-content>
+        <form [formGroup]="form" (ngSubmit)="submit()" class="login-form">
+          <mat-form-field appearance="outline">
+            <mat-label>Username</mat-label>
+            <input matInput
+                   formControlName="username"
+                   autocomplete="username"
+                   autofocus
+                   minlength="3"
+                   maxlength="50" />
+            <mat-hint>3–50 chars · letters, numbers, dots, hyphens, underscores</mat-hint>
+            <mat-error *ngIf="form.controls.username.hasError('required')">Required</mat-error>
+            <mat-error *ngIf="form.controls.username.hasError('minlength')">Min 3 characters</mat-error>
+            <mat-error *ngIf="form.controls.username.hasError('pattern')">
+              Use only letters, numbers, dots, hyphens, or underscores
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Password</mat-label>
+            <input matInput
+                   formControlName="password"
+                   [type]="hidePassword() ? 'password' : 'text'"
+                   autocomplete="new-password"
+                   minlength="6" />
+            <button type="button" mat-icon-button matSuffix
+                    (click)="hidePassword.set(!hidePassword())">
+              <mat-icon>{{ hidePassword() ? 'visibility' : 'visibility_off' }}</mat-icon>
+            </button>
+            <mat-error *ngIf="form.controls.password.hasError('required')">Required</mat-error>
+            <mat-error *ngIf="form.controls.password.hasError('minlength')">Min 6 characters</mat-error>
+          </mat-form-field>
+
+          <!-- Password strength meter -->
+          <div class="strength-meter" *ngIf="passwordValue()">
+            <div class="strength-bar">
+              <div class="strength-segment" [ngClass]="segmentClass(0)"></div>
+              <div class="strength-segment" [ngClass]="segmentClass(1)"></div>
+              <div class="strength-segment" [ngClass]="segmentClass(2)"></div>
+              <div class="strength-segment" [ngClass]="segmentClass(3)"></div>
+            </div>
+            <span class="strength-label" [ngClass]="strengthClass()">
+              Strength: {{ strengthLabel() }}
+            </span>
+          </div>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Confirm Password</mat-label>
+            <input matInput
+                   formControlName="confirmPassword"
+                   [type]="hideConfirm() ? 'password' : 'text'"
+                   autocomplete="new-password" />
+            <button type="button" mat-icon-button matSuffix
+                    (click)="hideConfirm.set(!hideConfirm())">
+              <mat-icon>{{ hideConfirm() ? 'visibility' : 'visibility_off' }}</mat-icon>
+            </button>
+            <mat-error *ngIf="form.controls.confirmPassword.hasError('required')">Required</mat-error>
+          </mat-form-field>
+
+          <div *ngIf="form.errors?.['passwordMismatch'] && form.controls.confirmPassword.touched"
+               class="form-error">
+            Passwords don't match.
+          </div>
+
+          <button type="submit" mat-flat-button class="login-btn"
+                  [disabled]="form.invalid || loading()">
+            <mat-spinner *ngIf="loading()" diameter="20"></mat-spinner>
+            <span *ngIf="!loading()">Create Account</span>
+          </button>
+
+          <div class="auth-links">
+            <span>Already have an account?</span>
+            <a routerLink="/login">Sign in</a>
+          </div>
+        </form>
+      </mat-card-content>
+    </mat-card>
+  </section>
+</div>

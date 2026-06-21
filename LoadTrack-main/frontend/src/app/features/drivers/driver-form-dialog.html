@@ -1,0 +1,54 @@
+<h2 mat-dialog-title>{{ isEdit ? 'Edit Driver' : 'Add Driver' }}</h2>
+
+<form [formGroup]="form" (ngSubmit)="save()">
+  <mat-dialog-content class="form-content">
+    <mat-form-field appearance="outline">
+      <mat-label>Name</mat-label>
+      <input matInput formControlName="name" />
+      <mat-error *ngIf="form.controls.name.hasError('required')">Required</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Phone (10 digits)</mat-label>
+      <input matInput formControlName="phone" maxlength="10" />
+      <mat-error *ngIf="form.controls.phone.hasError('required')">Required</mat-error>
+      <mat-error *ngIf="form.controls.phone.hasError('pattern')">Phone must be 10 digits</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>License Number</mat-label>
+      <input matInput formControlName="licenseNumber" />
+      <mat-error *ngIf="form.controls.licenseNumber.hasError('required')">Required</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Address</mat-label>
+      <textarea matInput formControlName="address" rows="2"></textarea>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Salary Per Trip (₹)</mat-label>
+      <input matInput type="number" step="1" min="0" formControlName="salaryPerTrip" />
+      <mat-error *ngIf="form.controls.salaryPerTrip.hasError('required')">Required</mat-error>
+      <mat-error *ngIf="form.controls.salaryPerTrip.hasError('min')">Cannot be negative</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Assigned Truck (optional)</mat-label>
+      <mat-select formControlName="assignedTruckId">
+        <mat-option [value]="null">-- None --</mat-option>
+        <mat-option *ngFor="let t of trucks()" [value]="t.id">
+          {{ t.truckNumber }} ({{ t.model }})
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button type="button" mat-button (click)="cancel()" [disabled]="saving()">Cancel</button>
+    <button type="submit" mat-flat-button color="primary" [disabled]="form.invalid || saving()">
+      <mat-spinner *ngIf="saving()" diameter="18"></mat-spinner>
+      <span *ngIf="!saving()">{{ isEdit ? 'Update' : 'Add' }}</span>
+    </button>
+  </mat-dialog-actions>
+</form>

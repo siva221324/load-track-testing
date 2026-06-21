@@ -1,0 +1,31 @@
+<h2 mat-dialog-title>Reject Request #{{ data.request.id }}</h2>
+
+<mat-dialog-content>
+  <p class="info">
+    Rejecting request from <strong>{{ data.request.dealer.name }}</strong> for
+    <strong>{{ data.request.tons }} tons of {{ data.request.sandType.name }}</strong>.
+  </p>
+
+  <form [formGroup]="form" class="reject-form">
+    <mat-form-field appearance="outline">
+      <mat-label>Reason for rejection (shown to dealer)</mat-label>
+      <textarea matInput formControlName="reason" rows="4"
+                placeholder="e.g. No trucks available on requested date, please request again next week"
+                maxlength="2000"></textarea>
+      <mat-error *ngIf="form.controls.reason.hasError('required')">A reason is required</mat-error>
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button type="button" mat-button (click)="cancel()" [disabled]="saving()">Cancel</button>
+  <button type="button" mat-flat-button color="warn"
+          [disabled]="form.invalid || saving()"
+          (click)="reject()">
+    <mat-spinner *ngIf="saving()" diameter="18"></mat-spinner>
+    <span *ngIf="!saving()">
+      <mat-icon>close</mat-icon>
+      Reject Request
+    </span>
+  </button>
+</mat-dialog-actions>

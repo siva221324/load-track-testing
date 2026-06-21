@@ -1,0 +1,106 @@
+<h2 mat-dialog-title>{{ isEdit ? 'Edit Trip' : 'Create Trip' }}</h2>
+
+<mat-dialog-content class="form-content">
+  <mat-progress-bar *ngIf="loading()" mode="indeterminate"></mat-progress-bar>
+
+  <form *ngIf="!loading()" [formGroup]="form" (ngSubmit)="save()">
+
+    <div class="row two-col">
+      <mat-form-field appearance="outline">
+        <mat-label>Truck</mat-label>
+        <mat-select formControlName="truckId">
+          <mat-option *ngFor="let t of trucks()" [value]="t.id">
+            {{ t.truckNumber }} ({{ t.model }}) — {{ t.status }}
+          </mat-option>
+        </mat-select>
+        <mat-error *ngIf="form.controls.truckId.hasError('required')">Required</mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Driver</mat-label>
+        <mat-select formControlName="driverId">
+          <mat-option *ngFor="let d of drivers()" [value]="d.id">
+            {{ d.name }} ({{ d.phone }})
+          </mat-option>
+        </mat-select>
+        <mat-error *ngIf="form.controls.driverId.hasError('required')">Required</mat-error>
+      </mat-form-field>
+    </div>
+
+    <div class="row two-col">
+      <mat-form-field appearance="outline">
+        <mat-label>Dealer</mat-label>
+        <mat-select formControlName="dealerId">
+          <mat-option *ngFor="let d of dealers()" [value]="d.id">
+            {{ d.name }} ({{ d.phone }})
+          </mat-option>
+        </mat-select>
+        <mat-error *ngIf="form.controls.dealerId.hasError('required')">Required</mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Sand Type</mat-label>
+        <mat-select formControlName="sandTypeId">
+          <mat-option *ngFor="let s of sandTypes()" [value]="s.id">
+            {{ s.name }} — ₹{{ s.pricePerTon }}/ton
+          </mat-option>
+        </mat-select>
+        <mat-error *ngIf="form.controls.sandTypeId.hasError('required')">Required</mat-error>
+      </mat-form-field>
+    </div>
+
+    <div class="row two-col">
+      <mat-form-field appearance="outline">
+        <mat-label>Tons</mat-label>
+        <input matInput type="number" step="0.1" min="0.01" formControlName="tons" />
+        <mat-error *ngIf="form.controls.tons.hasError('required')">Required</mat-error>
+        <mat-error *ngIf="form.controls.tons.hasError('min')">Must be greater than zero</mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Trip Date</mat-label>
+        <input matInput type="date" formControlName="tripDate" />
+        <mat-error *ngIf="form.controls.tripDate.hasError('required')">Required</mat-error>
+      </mat-form-field>
+    </div>
+
+    <div class="row">
+      <mat-form-field appearance="outline" class="full">
+        <mat-label>Source Location</mat-label>
+        <input matInput formControlName="sourceLocation" />
+        <mat-error *ngIf="form.controls.sourceLocation.hasError('required')">Required</mat-error>
+      </mat-form-field>
+    </div>
+
+    <div class="row">
+      <mat-form-field appearance="outline" class="full">
+        <mat-label>Destination Location</mat-label>
+        <input matInput formControlName="destinationLocation" />
+        <mat-error *ngIf="form.controls.destinationLocation.hasError('required')">Required</mat-error>
+      </mat-form-field>
+    </div>
+
+    <!-- Live calculation summary -->
+    <div class="calc-box">
+      <div class="calc-row">
+        <span class="label">Rate per ton:</span>
+        <span class="value">₹{{ ratePerTon() | number:'1.2-2' }}</span>
+      </div>
+      <div class="calc-row total">
+        <span class="label">Total amount:</span>
+        <span class="value">₹{{ currentTotal | number:'1.2-2' }}</span>
+      </div>
+      <p class="hint">Auto-calculated from tons × rate. Snapshotted on save so price changes won't alter this trip.</p>
+    </div>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button type="button" mat-button (click)="cancel()" [disabled]="saving()">Cancel</button>
+  <button type="button" mat-flat-button color="primary"
+          [disabled]="form.invalid || saving() || loading()"
+          (click)="save()">
+    <mat-spinner *ngIf="saving()" diameter="18"></mat-spinner>
+    <span *ngIf="!saving()">{{ isEdit ? 'Update' : 'Create' }}</span>
+  </button>
+</mat-dialog-actions>

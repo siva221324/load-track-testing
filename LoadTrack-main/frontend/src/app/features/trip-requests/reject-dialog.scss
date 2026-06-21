@@ -1,0 +1,23 @@
+:host {
+  display: block;
+  min-width: 460px;
+  max-width: 560px;
+}
+
+.info {
+  color: #555;
+  margin: 0 0 12px;
+  padding: 10px 14px;
+  background: #fff3e0;
+  border-left: 4px solid #e65100;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+.reject-form mat-form-field { width: 100%; }
+
+button[mat-flat-button] span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}

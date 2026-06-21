@@ -1,0 +1,154 @@
+.dashboard-page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+
+  h1 {
+    margin: 0;
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    mat-icon {
+      color: #666;
+      font-size: 28px;
+      width: 28px;
+      height: 28px;
+    }
+  }
+
+  .welcome {
+    color: #666;
+    font-size: 0.9rem;
+  }
+}
+
+.overdue-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #ffebee;
+  border-left: 4px solid #c62828;
+  border-radius: 6px;
+  padding: 12px 16px;
+  color: #b71c1c;
+  font-size: 0.9rem;
+
+  mat-icon {
+    font-size: 24px;
+    width: 24px;
+    height: 24px;
+  }
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.stat-card {
+  border-left: 4px solid transparent;
+
+  &.accent-blue   { border-left-color: #1976d2; }
+  &.accent-green  { border-left-color: #2e7d32; }
+  &.accent-orange { border-left-color: #e65100; }
+  &.accent-purple { border-left-color: #6a1b9a; }
+  &.accent-teal   { border-left-color: #00897b; }
+  &.accent-red    { border-left-color: #c62828; }
+}
+
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.stat-label {
+  font-size: 0.78rem;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.stat-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 4px 0;
+  color: #1a1a1a;
+}
+
+.stat-sub {
+  font-size: 0.75rem;
+  color: #888;
+}
+
+.stat-icon {
+  font-size: 36px;
+  width: 36px;
+  height: 36px;
+  opacity: 0.4;
+}
+
+.accent-blue .stat-icon   { color: #1976d2; }
+.accent-green .stat-icon  { color: #2e7d32; }
+.accent-orange .stat-icon { color: #e65100; }
+.accent-purple .stat-icon { color: #6a1b9a; }
+.accent-teal .stat-icon   { color: #00897b; }
+.accent-red .stat-icon    { color: #c62828; }
+
+.charts-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 16px;
+
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.chart-card {
+  .chart-host {
+    height: 280px;
+    margin-top: 8px;
+  }
+}
+
+.summary-card {
+  .summary-row {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  .summary-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+
+    .label {
+      font-size: 0.78rem;
+      color: #666;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .value {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #1976d2;
+    }
+    .value.paid { color: #2e7d32; }
+    .value.due { color: #c62828; }
+  }
+}

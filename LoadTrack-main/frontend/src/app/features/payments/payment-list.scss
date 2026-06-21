@@ -1,0 +1,90 @@
+.payments-page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.page-header h1 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+
+  .filter-label {
+    color: #666;
+    font-size: 0.9rem;
+  }
+}
+
+.overdue-toggle {
+  margin-left: auto;
+}
+
+.table-wrap {
+  background: white;
+  border-radius: 4px;
+  overflow: auto;
+}
+
+table {
+  width: 100%;
+  min-width: 1200px;
+}
+
+.actions-col {
+  width: 260px;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.receipt-btn {
+  margin-left: 8px;
+}
+
+.empty-row {
+  text-align: center;
+  padding: 24px;
+  color: #888;
+}
+
+.status-chip {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 0.78rem;
+  font-weight: 500;
+
+  &[data-status="PENDING"] { background: #fff3e0; color: #e65100; }
+  &[data-status="PARTIAL"] { background: #e3f2fd; color: #1565c0; }
+  &[data-status="PAID"]    { background: #e8f5e9; color: #2e7d32; }
+}
+
+.overdue-badge {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 3px 8px;
+  border-radius: 10px;
+  background: #ffebee;
+  color: #c62828;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.interest-badge {
+  color: #e65100;
+  font-weight: 500;
+}
+
+.balance-due {
+  color: #c62828;
+}
+
+tr.row-overdue {
+  background: #fff8f8;
+}

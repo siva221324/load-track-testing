@@ -1,0 +1,120 @@
+.admin-requests-page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.page-header {
+  h1 {
+    margin: 0;
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    mat-icon {
+      color: #1976d2;
+      font-size: 30px;
+      width: 30px;
+      height: 30px;
+    }
+
+    .pending-badge {
+      background: #fff3e0;
+      color: #e65100;
+      padding: 4px 12px;
+      border-radius: 14px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-left: 4px;
+    }
+  }
+  .subtitle {
+    margin: 6px 0 0;
+    color: #666;
+    font-size: 0.92rem;
+  }
+}
+
+.filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+
+  .filter-label {
+    color: #666;
+    font-size: 0.9rem;
+  }
+}
+
+.table-wrap {
+  background: white;
+  border-radius: 6px;
+  overflow: auto;
+}
+
+table { width: 100%; min-width: 1300px; }
+
+.route-cell {
+  max-width: 240px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.actions-col {
+  width: 240px;
+  text-align: right;
+  white-space: nowrap;
+
+  button { margin-left: 0; }
+  .reject-btn { margin-left: 6px; }
+
+  button span,
+  button {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+}
+
+.status-chip {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 0.78rem;
+  font-weight: 500;
+
+  &[data-status="PENDING"]    { background: #fff3e0; color: #e65100; }
+  &[data-status="APPROVED"]   { background: #e8f5e9; color: #2e7d32; }
+  &[data-status="REJECTED"]   { background: #ffebee; color: #c62828; }
+  &[data-status="CANCELLED"]  { background: #eceff1; color: #546e7a; }
+}
+
+.trip-link {
+  font-size: 0.75rem;
+  color: #2e7d32;
+  font-weight: 500;
+  margin-top: 4px;
+}
+
+.muted { color: #999; font-size: 0.85rem; cursor: help; }
+
+.empty-row {
+  text-align: center;
+  padding: 36px 24px !important;
+  color: #888;
+
+  .empty-icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    color: #ccc;
+    margin-bottom: 8px;
+  }
+}
+
+tr.row-pending { background: #fffdf6; }

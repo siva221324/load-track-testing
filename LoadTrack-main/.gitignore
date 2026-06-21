@@ -1,0 +1,56 @@
+# === Secrets — NEVER commit ===
+**/application.properties
+**/application-*.properties
+!**/application.properties.example
+!**/application-*.properties.example
+.env
+.env.*
+*.pem
+*.key
+
+# === Backend (Java / Maven / Spring Boot) ===
+backend/target/
+backend/.mvn/wrapper/maven-wrapper.jar
+backend/HELP.md
+**/*.class
+**/*.jar
+!backend/.mvn/wrapper/maven-wrapper.jar.bak
+
+# === Frontend (Node / Angular) ===
+frontend/node_modules/
+frontend/dist/
+frontend/.angular/
+frontend/coverage/
+frontend/tmp/
+frontend/out-tsc/
+frontend/bazel-out/
+*.tsbuildinfo
+
+# === Logs ===
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# === IDEs / editors ===
+.idea/
+*.iml
+*.iws
+*.ipr
+.vscode/settings.json
+.vscode/launch.json
+.project
+.classpath
+.settings/
+.factorypath
+.springBeans
+.sts4-cache/
+
+# === OS ===
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# === Receipt PDFs (generated at runtime in Phase 10) ===
+backend/receipts/

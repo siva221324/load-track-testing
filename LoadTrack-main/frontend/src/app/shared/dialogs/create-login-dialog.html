@@ -1,0 +1,46 @@
+<h2 mat-dialog-title>Create Login Account</h2>
+
+<mat-dialog-content>
+  <p class="entity-info">
+    <strong>{{ data.entityType === 'driver' ? 'Driver' : 'Dealer' }}:</strong> {{ data.entityName }}
+  </p>
+
+  <div *ngIf="data.existing" class="existing-warning">
+    <mat-icon>warning</mat-icon>
+    A login already exists: <strong>{{ data.existing.username }}</strong>. Creating a new one will fail.
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="save()" class="login-form">
+    <mat-form-field appearance="outline">
+      <mat-label>Username</mat-label>
+      <input matInput formControlName="username" autocomplete="off" />
+      <mat-error *ngIf="form.controls.username.hasError('required')">Required</mat-error>
+      <mat-error *ngIf="form.controls.username.hasError('minlength')">Min 3 characters</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Password</mat-label>
+      <input matInput
+             [type]="hidePassword() ? 'password' : 'text'"
+             formControlName="password"
+             autocomplete="new-password" />
+      <button type="button" mat-icon-button matSuffix
+              (click)="hidePassword.set(!hidePassword())">
+        <mat-icon>{{ hidePassword() ? 'visibility' : 'visibility_off' }}</mat-icon>
+      </button>
+      <mat-error *ngIf="form.controls.password.hasError('required')">Required</mat-error>
+      <mat-error *ngIf="form.controls.password.hasError('minlength')">Min 6 characters</mat-error>
+      <mat-hint>Share these credentials with the {{ data.entityType }} so they can log in.</mat-hint>
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button type="button" mat-button (click)="cancel()" [disabled]="saving()">Cancel</button>
+  <button type="button" mat-flat-button color="primary"
+          [disabled]="form.invalid || saving()"
+          (click)="save()">
+    <mat-spinner *ngIf="saving()" diameter="18"></mat-spinner>
+    <span *ngIf="!saving()">Create Login</span>
+  </button>
+</mat-dialog-actions>

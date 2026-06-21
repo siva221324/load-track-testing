@@ -1,0 +1,208 @@
+.dealer-dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Hero card */
+.hero-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: linear-gradient(135deg, #e65100 0%, #bf360c 100%);
+  color: white;
+  padding: 20px 24px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+
+  .hero-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+
+    mat-icon {
+      font-size: 36px;
+      width: 36px;
+      height: 36px;
+    }
+  }
+
+  .hero-greeting { font-size: 0.9rem; opacity: 0.9; }
+  .hero-name { font-size: 1.5rem; font-weight: 600; margin: 2px 0; }
+  .hero-meta { font-size: 0.85rem; opacity: 0.85; }
+}
+
+/* Overdue alert banner */
+.overdue-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #ffebee;
+  border-left: 4px solid #c62828;
+  border-radius: 6px;
+  padding: 14px 18px;
+  color: #b71c1c;
+
+  mat-icon {
+    font-size: 28px;
+    width: 28px;
+    height: 28px;
+    flex-shrink: 0;
+  }
+
+  div { font-size: 0.9rem; }
+}
+
+/* Stats grid */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 12px;
+}
+
+.stat-card {
+  border-left: 4px solid transparent;
+
+  &.accent-blue   { border-left-color: #1976d2; }
+  &.accent-green  { border-left-color: #2e7d32; }
+  &.accent-red    { border-left-color: #c62828; }
+  &.accent-purple { border-left-color: #6a1b9a; }
+}
+
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.stat-label {
+  font-size: 0.8rem;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.stat-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 4px 0;
+  color: #1a1a1a;
+}
+
+.stat-sub {
+  font-size: 0.78rem;
+  color: #888;
+}
+
+.stat-icon {
+  font-size: 40px;
+  width: 40px;
+  height: 40px;
+}
+
+.accent-blue .stat-icon   { color: #bbdefb; }
+.accent-green .stat-icon  { color: #c8e6c9; }
+.accent-red .stat-icon    { color: #ffcdd2; }
+.accent-purple .stat-icon { color: #e1bee7; }
+
+.progress-track {
+  margin-top: 12px;
+  height: 6px;
+  background: #e0e0e0;
+  border-radius: 3px;
+  overflow: hidden;
+}
+.progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #2e7d32, #66bb6a);
+  border-radius: 3px;
+  transition: width 0.4s ease;
+}
+
+/* Payments section */
+.payments-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+
+  h2 {
+    margin: 0;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    mat-icon { color: #666; }
+  }
+}
+
+.filter-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.table-wrap {
+  background: white;
+  border-radius: 4px;
+  overflow: auto;
+}
+
+table { width: 100%; min-width: 1300px; }
+
+.empty-row {
+  text-align: center;
+  padding: 36px 24px !important;
+  color: #888;
+
+  .empty-icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    color: #ccc;
+    margin-bottom: 8px;
+  }
+}
+
+.status-chip {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 0.78rem;
+  font-weight: 500;
+
+  &[data-status="PENDING"] { background: #fff3e0; color: #e65100; }
+  &[data-status="PARTIAL"] { background: #e3f2fd; color: #1565c0; }
+  &[data-status="PAID"]    { background: #e8f5e9; color: #2e7d32; }
+}
+
+.overdue-badge {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: #ffebee;
+  color: #c62828;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.interest-badge { color: #e65100; font-weight: 500; }
+.balance-due { color: #c62828; }
+tr.row-overdue { background: #fff8f8; }

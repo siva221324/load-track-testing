@@ -1,0 +1,109 @@
+<div class="trips-page">
+  <div class="page-header">
+    <h1>Trips</h1>
+    <button mat-flat-button color="primary" (click)="add()">
+      <mat-icon>add</mat-icon>
+      Create Trip
+    </button>
+  </div>
+
+  <div class="filter-bar">
+    <span class="filter-label">Filter by status:</span>
+    <mat-button-toggle-group [value]="statusFilter()" (change)="setStatusFilter($event.value)">
+      <mat-button-toggle value="">All</mat-button-toggle>
+      <mat-button-toggle value="PENDING">Pending</mat-button-toggle>
+      <mat-button-toggle value="STARTED">Started</mat-button-toggle>
+      <mat-button-toggle value="COMPLETED">Completed</mat-button-toggle>
+    </mat-button-toggle-group>
+  </div>
+
+  <div class="table-wrap">
+    <mat-progress-bar *ngIf="loading()" mode="indeterminate"></mat-progress-bar>
+
+    <table mat-table [dataSource]="data()" matSort (matSortChange)="onSort($event)" class="mat-elevation-z1">
+
+      <ng-container matColumnDef="id">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>ID</th>
+        <td mat-cell *matCellDef="let t">{{ t.id }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="tripDate">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header="tripDate">Date</th>
+        <td mat-cell *matCellDef="let t">{{ t.tripDate }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="truck">
+        <th mat-header-cell *matHeaderCellDef>Truck</th>
+        <td mat-cell *matCellDef="let t">{{ t.truck.truckNumber }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="driver">
+        <th mat-header-cell *matHeaderCellDef>Driver</th>
+        <td mat-cell *matCellDef="let t">{{ t.driver.name }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="dealer">
+        <th mat-header-cell *matHeaderCellDef>Dealer</th>
+        <td mat-cell *matCellDef="let t">{{ t.dealer.name }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="sandType">
+        <th mat-header-cell *matHeaderCellDef>Sand Type</th>
+        <td mat-cell *matCellDef="let t">{{ t.sandType.name }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="tons">
+        <th mat-header-cell *matHeaderCellDef>Tons</th>
+        <td mat-cell *matCellDef="let t">{{ t.tons }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="totalAmount">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header="totalAmount">Total (₹)</th>
+        <td mat-cell *matCellDef="let t">{{ t.totalAmount | number:'1.2-2' }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="status">
+        <th mat-header-cell *matHeaderCellDef>Status</th>
+        <td mat-cell *matCellDef="let t">
+          <span class="status-chip" [attr.data-status]="t.status">{{ t.status }}</span>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef class="actions-col">Actions</th>
+        <td mat-cell *matCellDef="let t" class="actions-col">
+          <button *ngIf="t.status === 'PENDING'" mat-icon-button color="primary"
+                  (click)="changeStatus(t, 'STARTED')" matTooltip="Mark as Started">
+            <mat-icon>play_arrow</mat-icon>
+          </button>
+          <button *ngIf="t.status === 'STARTED'" mat-icon-button color="primary"
+                  (click)="changeStatus(t, 'COMPLETED')" matTooltip="Mark as Completed">
+            <mat-icon>check_circle</mat-icon>
+          </button>
+          <button mat-icon-button (click)="edit(t)" matTooltip="Edit"
+                  [disabled]="t.status !== 'PENDING'">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button color="warn" (click)="remove(t)" matTooltip="Delete">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+
+      <tr class="mat-row" *matNoDataRow>
+        <td class="mat-cell empty-row" [attr.colspan]="displayedColumns.length">No trips found.</td>
+      </tr>
+    </table>
+
+    <mat-paginator
+      [length]="totalElements()"
+      [pageSize]="pageSize"
+      [pageSizeOptions]="[5, 10, 20, 50]"
+      [pageIndex]="pageIndex"
+      (page)="onPage($event)">
+    </mat-paginator>
+  </div>
+</div>

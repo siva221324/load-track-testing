@@ -1,0 +1,123 @@
+<div class="payments-page">
+  <div class="page-header">
+    <h1>Payments</h1>
+  </div>
+
+  <div class="filter-bar">
+    <span class="filter-label">Status:</span>
+    <mat-button-toggle-group [value]="statusFilter()" (change)="setStatusFilter($event.value)">
+      <mat-button-toggle value="">All</mat-button-toggle>
+      <mat-button-toggle value="PENDING">Pending</mat-button-toggle>
+      <mat-button-toggle value="PARTIAL">Partial</mat-button-toggle>
+      <mat-button-toggle value="PAID">Paid</mat-button-toggle>
+    </mat-button-toggle-group>
+
+    <mat-checkbox [checked]="overdueOnly()" (change)="toggleOverdue()" class="overdue-toggle">
+      Show overdue only
+    </mat-checkbox>
+  </div>
+
+  <div class="table-wrap">
+    <mat-progress-bar *ngIf="loading()" mode="indeterminate"></mat-progress-bar>
+
+    <table mat-table [dataSource]="data()" matSort (matSortChange)="onSort($event)" class="mat-elevation-z1">
+
+      <ng-container matColumnDef="id">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>ID</th>
+        <td mat-cell *matCellDef="let p">{{ p.id }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="tripDate">
+        <th mat-header-cell *matHeaderCellDef>Trip Date</th>
+        <td mat-cell *matCellDef="let p">{{ p.trip.tripDate }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="truck">
+        <th mat-header-cell *matHeaderCellDef>Truck</th>
+        <td mat-cell *matCellDef="let p">{{ p.trip.truckNumber }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="dealer">
+        <th mat-header-cell *matHeaderCellDef>Dealer</th>
+        <td mat-cell *matCellDef="let p">{{ p.trip.dealerName }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="original">
+        <th mat-header-cell *matHeaderCellDef>Original (₹)</th>
+        <td mat-cell *matCellDef="let p">{{ p.originalAmount | number:'1.2-2' }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="interest">
+        <th mat-header-cell *matHeaderCellDef>Interest (₹)</th>
+        <td mat-cell *matCellDef="let p">
+          <span [class.interest-badge]="p.interestAmount > 0">
+            {{ p.interestAmount | number:'1.2-2' }}
+          </span>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="final">
+        <th mat-header-cell *matHeaderCellDef>Final (₹)</th>
+        <td mat-cell *matCellDef="let p"><strong>{{ p.finalAmount | number:'1.2-2' }}</strong></td>
+      </ng-container>
+
+      <ng-container matColumnDef="paid">
+        <th mat-header-cell *matHeaderCellDef>Paid (₹)</th>
+        <td mat-cell *matCellDef="let p">{{ p.paidAmount | number:'1.2-2' }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="balance">
+        <th mat-header-cell *matHeaderCellDef>Balance (₹)</th>
+        <td mat-cell *matCellDef="let p">
+          <strong [class.balance-due]="p.balanceDue > 0">
+            {{ p.balanceDue | number:'1.2-2' }}
+          </strong>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="status">
+        <th mat-header-cell *matHeaderCellDef>Status</th>
+        <td mat-cell *matCellDef="let p">
+          <span class="status-chip" [attr.data-status]="p.paymentStatus">{{ p.paymentStatus }}</span>
+          <span *ngIf="p.overdue" class="overdue-badge" matTooltip="Days overdue: {{ p.daysOverdue }}">
+            Overdue
+          </span>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef class="actions-col">Actions</th>
+        <td mat-cell *matCellDef="let p" class="actions-col">
+          <button mat-flat-button color="primary"
+                  (click)="pay(p)"
+                  [disabled]="p.paymentStatus === 'PAID'">
+            <mat-icon>payments</mat-icon>
+            Record
+          </button>
+          <button mat-stroked-button
+                  (click)="downloadReceipt(p)"
+                  matTooltip="Download PDF receipt"
+                  class="receipt-btn">
+            <mat-icon>description</mat-icon>
+            Receipt
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns" [class.row-overdue]="row.overdue"></tr>
+
+      <tr class="mat-row" *matNoDataRow>
+        <td class="mat-cell empty-row" [attr.colspan]="displayedColumns.length">No payments found.</td>
+      </tr>
+    </table>
+
+    <mat-paginator
+      [length]="totalElements()"
+      [pageSize]="pageSize"
+      [pageSizeOptions]="[5, 10, 20, 50]"
+      [pageIndex]="pageIndex"
+      (page)="onPage($event)">
+    </mat-paginator>
+  </div>
+</div>

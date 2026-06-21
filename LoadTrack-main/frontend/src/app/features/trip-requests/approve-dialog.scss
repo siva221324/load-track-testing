@@ -1,0 +1,48 @@
+:host {
+  display: block;
+  min-width: 520px;
+  max-width: 640px;
+}
+
+.request-summary {
+  background: #f5f7fa;
+  border-radius: 8px;
+  padding: 14px 18px;
+  margin-bottom: 16px;
+
+  .row {
+    display: flex;
+    gap: 8px;
+    padding: 3px 0;
+    font-size: 0.9rem;
+
+    .label { color: #666; min-width: 110px; }
+  }
+
+  .row.total {
+    margin-top: 6px;
+    padding-top: 8px;
+    border-top: 1px solid #d0d7e2;
+    font-weight: 600;
+    color: #1976d2;
+  }
+
+  .row.note {
+    margin-top: 6px;
+    padding-top: 8px;
+    border-top: 1px dashed #d0d7e2;
+    font-style: italic;
+  }
+}
+
+.approve-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+button[mat-flat-button] span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}

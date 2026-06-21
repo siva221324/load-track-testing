@@ -1,0 +1,62 @@
+.trips-page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  h1 {
+    margin: 0;
+    font-size: 1.5rem;
+  }
+}
+
+.filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  .filter-label {
+    color: #666;
+    font-size: 0.9rem;
+  }
+}
+
+.table-wrap {
+  background: white;
+  border-radius: 4px;
+  overflow: auto;
+}
+
+table {
+  width: 100%;
+  min-width: 1100px;
+}
+
+.actions-col {
+  width: 200px;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.empty-row {
+  text-align: center;
+  padding: 24px;
+  color: #888;
+}
+
+.status-chip {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 0.78rem;
+  font-weight: 500;
+
+  &[data-status="PENDING"]   { background: #fff3e0; color: #e65100; }
+  &[data-status="STARTED"]   { background: #e3f2fd; color: #1565c0; }
+  &[data-status="COMPLETED"] { background: #e8f5e9; color: #2e7d32; }
+}

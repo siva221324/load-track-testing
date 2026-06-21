@@ -1,0 +1,151 @@
+<div class="dashboard-page">
+  <div class="page-header">
+    <h1><mat-icon>dashboard</mat-icon> Admin Dashboard</h1>
+    <span class="welcome" *ngIf="auth.user() as u">Welcome back, <strong>{{ u.username }}</strong></span>
+  </div>
+
+  <mat-progress-bar *ngIf="loading()" mode="indeterminate"></mat-progress-bar>
+
+  <ng-container *ngIf="data() as d">
+
+    <!-- Top alert if there are overdue payments -->
+    <div *ngIf="d.overduePayments > 0" class="overdue-banner">
+      <mat-icon>warning</mat-icon>
+      <strong>{{ d.overduePayments }}</strong> payment(s) are overdue. Interest is being added daily.
+    </div>
+
+    <!-- Summary stats grid -->
+    <div class="stats-grid">
+      <mat-card class="stat-card accent-blue">
+        <mat-card-content>
+          <div class="stat-row">
+            <div>
+              <div class="stat-label">Trucks</div>
+              <div class="stat-value">{{ d.totalTrucks }}</div>
+              <div class="stat-sub">{{ d.availableTrucks }} available · {{ d.onTripTrucks }} on trip</div>
+            </div>
+            <mat-icon class="stat-icon">local_shipping</mat-icon>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="stat-card accent-green">
+        <mat-card-content>
+          <div class="stat-row">
+            <div>
+              <div class="stat-label">Drivers</div>
+              <div class="stat-value">{{ d.totalDrivers }}</div>
+              <div class="stat-sub">Active fleet</div>
+            </div>
+            <mat-icon class="stat-icon">badge</mat-icon>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="stat-card accent-orange">
+        <mat-card-content>
+          <div class="stat-row">
+            <div>
+              <div class="stat-label">Dealers</div>
+              <div class="stat-value">{{ d.totalDealers }}</div>
+              <div class="stat-sub">Customers</div>
+            </div>
+            <mat-icon class="stat-icon">storefront</mat-icon>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="stat-card accent-purple">
+        <mat-card-content>
+          <div class="stat-row">
+            <div>
+              <div class="stat-label">Trips</div>
+              <div class="stat-value">{{ d.totalTrips }}</div>
+              <div class="stat-sub">{{ d.activeTrips }} active · {{ d.pendingTrips }} pending</div>
+            </div>
+            <mat-icon class="stat-icon">route</mat-icon>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="stat-card accent-teal">
+        <mat-card-content>
+          <div class="stat-row">
+            <div>
+              <div class="stat-label">This Month Earnings</div>
+              <div class="stat-value">₹{{ d.thisMonthEarnings | number:'1.2-2' }}</div>
+              <div class="stat-sub">Collected this month</div>
+            </div>
+            <mat-icon class="stat-icon">trending_up</mat-icon>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="stat-card accent-red">
+        <mat-card-content>
+          <div class="stat-row">
+            <div>
+              <div class="stat-label">Outstanding</div>
+              <div class="stat-value">₹{{ d.outstandingBalance | number:'1.2-2' }}</div>
+              <div class="stat-sub">{{ d.pendingPayments }} pending · {{ d.overduePayments }} overdue</div>
+            </div>
+            <mat-icon class="stat-icon">account_balance_wallet</mat-icon>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Charts -->
+    <div class="charts-grid">
+      <mat-card class="chart-card chart-wide">
+        <mat-card-header>
+          <mat-card-title>Monthly Earnings (last 6 months)</mat-card-title>
+          <mat-card-subtitle>Total collected per month</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="chart-host">
+            <canvas baseChart
+                    [data]="earningsChartData"
+                    [options]="earningsChartOptions"
+                    type="bar"></canvas>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="chart-card">
+        <mat-card-header>
+          <mat-card-title>Trips by Status</mat-card-title>
+          <mat-card-subtitle>Current breakdown</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="chart-host">
+            <canvas baseChart
+                    [data]="tripsChartData"
+                    [options]="tripsChartOptions"
+                    type="doughnut"></canvas>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Total billed/collected summary -->
+    <mat-card class="summary-card">
+      <mat-card-content>
+        <div class="summary-row">
+          <div class="summary-item">
+            <span class="label">Total Billed</span>
+            <span class="value">₹{{ d.totalBilled | number:'1.2-2' }}</span>
+          </div>
+          <div class="summary-item">
+            <span class="label">Total Collected</span>
+            <span class="value paid">₹{{ d.totalCollected | number:'1.2-2' }}</span>
+          </div>
+          <div class="summary-item">
+            <span class="label">Outstanding</span>
+            <span class="value due">₹{{ d.outstandingBalance | number:'1.2-2' }}</span>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </ng-container>
+</div>

@@ -1,0 +1,247 @@
+<div class="reports-page">
+  <div class="page-header">
+    <h1><mat-icon>assessment</mat-icon> Reports</h1>
+    <div class="export-buttons">
+      <button mat-stroked-button color="primary" (click)="exportCurrent('xlsx')" [disabled]="exporting()">
+        <mat-icon>table_chart</mat-icon>
+        Export Excel
+      </button>
+      <button mat-stroked-button color="warn" (click)="exportCurrent('pdf')" [disabled]="exporting()">
+        <mat-icon>picture_as_pdf</mat-icon>
+        Export PDF
+      </button>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button [class.active]="activeTab() === 'trips'" (click)="setTab('trips')">
+      <mat-icon>route</mat-icon> Trips Report
+    </button>
+    <button [class.active]="activeTab() === 'payments'" (click)="setTab('payments')">
+      <mat-icon>payments</mat-icon> Payments Report
+    </button>
+  </div>
+
+  <!-- ============= TRIPS REPORT ============= -->
+  <ng-container *ngIf="activeTab() === 'trips'">
+    <mat-card class="filter-card">
+      <form [formGroup]="tripFilters" (ngSubmit)="runTrips()" class="filter-form">
+        <mat-form-field appearance="outline">
+          <mat-label>From</mat-label>
+          <input matInput type="date" formControlName="from" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>To</mat-label>
+          <input matInput type="date" formControlName="to" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Truck</mat-label>
+          <mat-select formControlName="truckId">
+            <mat-option [value]="null">All</mat-option>
+            <mat-option *ngFor="let t of trucks()" [value]="t.id">{{ t.truckNumber }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Driver</mat-label>
+          <mat-select formControlName="driverId">
+            <mat-option [value]="null">All</mat-option>
+            <mat-option *ngFor="let d of drivers()" [value]="d.id">{{ d.name }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Dealer</mat-label>
+          <mat-select formControlName="dealerId">
+            <mat-option [value]="null">All</mat-option>
+            <mat-option *ngFor="let d of dealers()" [value]="d.id">{{ d.name }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Status</mat-label>
+          <mat-select formControlName="status">
+            <mat-option value="">All</mat-option>
+            <mat-option value="PENDING">Pending</mat-option>
+            <mat-option value="STARTED">Started</mat-option>
+            <mat-option value="COMPLETED">Completed</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <button type="submit" mat-flat-button color="primary" class="run-btn">
+          <mat-icon>search</mat-icon>
+          Run Report
+        </button>
+      </form>
+    </mat-card>
+
+    <div class="result-meta">
+      <span><strong>{{ tripRows().length }}</strong> trip(s) found</span>
+    </div>
+
+    <mat-progress-bar *ngIf="loading()" mode="indeterminate"></mat-progress-bar>
+
+    <div class="table-wrap">
+      <table mat-table [dataSource]="tripRows()" class="mat-elevation-z1">
+        <ng-container matColumnDef="tripId">
+          <th mat-header-cell *matHeaderCellDef>ID</th>
+          <td mat-cell *matCellDef="let r">{{ r.tripId }}</td>
+        </ng-container>
+        <ng-container matColumnDef="tripDate">
+          <th mat-header-cell *matHeaderCellDef>Date</th>
+          <td mat-cell *matCellDef="let r">{{ r.tripDate }}</td>
+        </ng-container>
+        <ng-container matColumnDef="truckNumber">
+          <th mat-header-cell *matHeaderCellDef>Truck</th>
+          <td mat-cell *matCellDef="let r">{{ r.truckNumber }}</td>
+        </ng-container>
+        <ng-container matColumnDef="driverName">
+          <th mat-header-cell *matHeaderCellDef>Driver</th>
+          <td mat-cell *matCellDef="let r">{{ r.driverName }}</td>
+        </ng-container>
+        <ng-container matColumnDef="dealerName">
+          <th mat-header-cell *matHeaderCellDef>Dealer</th>
+          <td mat-cell *matCellDef="let r">{{ r.dealerName }}</td>
+        </ng-container>
+        <ng-container matColumnDef="sandTypeName">
+          <th mat-header-cell *matHeaderCellDef>Sand Type</th>
+          <td mat-cell *matCellDef="let r">{{ r.sandTypeName }}</td>
+        </ng-container>
+        <ng-container matColumnDef="tons">
+          <th mat-header-cell *matHeaderCellDef>Tons</th>
+          <td mat-cell *matCellDef="let r">{{ r.tons }}</td>
+        </ng-container>
+        <ng-container matColumnDef="totalAmount">
+          <th mat-header-cell *matHeaderCellDef>Total (₹)</th>
+          <td mat-cell *matCellDef="let r"><strong>{{ r.totalAmount | number:'1.2-2' }}</strong></td>
+        </ng-container>
+        <ng-container matColumnDef="status">
+          <th mat-header-cell *matHeaderCellDef>Status</th>
+          <td mat-cell *matCellDef="let r">
+            <span class="status-chip" [attr.data-status]="r.status">{{ r.status }}</span>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="tripDisplayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: tripDisplayedColumns"></tr>
+
+        <tr class="mat-row" *matNoDataRow>
+          <td class="mat-cell empty-row" [attr.colspan]="tripDisplayedColumns.length">No trips for these filters.</td>
+        </tr>
+      </table>
+    </div>
+  </ng-container>
+
+  <!-- ============= PAYMENTS REPORT ============= -->
+  <ng-container *ngIf="activeTab() === 'payments'">
+    <mat-card class="filter-card">
+      <form [formGroup]="paymentFilters" (ngSubmit)="runPayments()" class="filter-form">
+        <mat-form-field appearance="outline">
+          <mat-label>From (trip date)</mat-label>
+          <input matInput type="date" formControlName="from" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>To (trip date)</mat-label>
+          <input matInput type="date" formControlName="to" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Dealer</mat-label>
+          <mat-select formControlName="dealerId">
+            <mat-option [value]="null">All</mat-option>
+            <mat-option *ngFor="let d of dealers()" [value]="d.id">{{ d.name }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Status</mat-label>
+          <mat-select formControlName="paymentStatus">
+            <mat-option value="">All</mat-option>
+            <mat-option value="PENDING">Pending</mat-option>
+            <mat-option value="PARTIAL">Partial</mat-option>
+            <mat-option value="PAID">Paid</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-checkbox formControlName="overdueOnly">Overdue only</mat-checkbox>
+
+        <button type="submit" mat-flat-button color="primary" class="run-btn">
+          <mat-icon>search</mat-icon>
+          Run Report
+        </button>
+      </form>
+    </mat-card>
+
+    <div class="result-meta">
+      <span><strong>{{ paymentRows().length }}</strong> payment(s) found</span>
+    </div>
+
+    <mat-progress-bar *ngIf="loading()" mode="indeterminate"></mat-progress-bar>
+
+    <div class="table-wrap">
+      <table mat-table [dataSource]="paymentRows()" class="mat-elevation-z1">
+        <ng-container matColumnDef="paymentId">
+          <th mat-header-cell *matHeaderCellDef>ID</th>
+          <td mat-cell *matCellDef="let r">{{ r.paymentId }}</td>
+        </ng-container>
+        <ng-container matColumnDef="tripDate">
+          <th mat-header-cell *matHeaderCellDef>Trip Date</th>
+          <td mat-cell *matCellDef="let r">{{ r.tripDate }}</td>
+        </ng-container>
+        <ng-container matColumnDef="truckNumber">
+          <th mat-header-cell *matHeaderCellDef>Truck</th>
+          <td mat-cell *matCellDef="let r">{{ r.truckNumber }}</td>
+        </ng-container>
+        <ng-container matColumnDef="dealerName">
+          <th mat-header-cell *matHeaderCellDef>Dealer</th>
+          <td mat-cell *matCellDef="let r">{{ r.dealerName }}</td>
+        </ng-container>
+        <ng-container matColumnDef="originalAmount">
+          <th mat-header-cell *matHeaderCellDef>Original</th>
+          <td mat-cell *matCellDef="let r">{{ r.originalAmount | number:'1.2-2' }}</td>
+        </ng-container>
+        <ng-container matColumnDef="interestAmount">
+          <th mat-header-cell *matHeaderCellDef>Interest</th>
+          <td mat-cell *matCellDef="let r">{{ r.interestAmount | number:'1.2-2' }}</td>
+        </ng-container>
+        <ng-container matColumnDef="finalAmount">
+          <th mat-header-cell *matHeaderCellDef>Final</th>
+          <td mat-cell *matCellDef="let r"><strong>{{ r.finalAmount | number:'1.2-2' }}</strong></td>
+        </ng-container>
+        <ng-container matColumnDef="paidAmount">
+          <th mat-header-cell *matHeaderCellDef>Paid</th>
+          <td mat-cell *matCellDef="let r">{{ r.paidAmount | number:'1.2-2' }}</td>
+        </ng-container>
+        <ng-container matColumnDef="balanceDue">
+          <th mat-header-cell *matHeaderCellDef>Balance</th>
+          <td mat-cell *matCellDef="let r">
+            <strong [class.balance-due]="r.balanceDue > 0">{{ r.balanceDue | number:'1.2-2' }}</strong>
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="paymentStatus">
+          <th mat-header-cell *matHeaderCellDef>Status</th>
+          <td mat-cell *matCellDef="let r">
+            <span class="status-chip" [attr.data-status]="r.paymentStatus">{{ r.paymentStatus }}</span>
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="overdue">
+          <th mat-header-cell *matHeaderCellDef>Overdue</th>
+          <td mat-cell *matCellDef="let r">
+            <span *ngIf="r.overdue" class="overdue-badge">Yes</span>
+            <span *ngIf="!r.overdue" class="muted">—</span>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="paymentDisplayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: paymentDisplayedColumns" [class.row-overdue]="row.overdue"></tr>
+
+        <tr class="mat-row" *matNoDataRow>
+          <td class="mat-cell empty-row" [attr.colspan]="paymentDisplayedColumns.length">No payments for these filters.</td>
+        </tr>
+      </table>
+    </div>
+  </ng-container>
+</div>

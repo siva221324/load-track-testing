@@ -1,0 +1,147 @@
+<div class="driver-dashboard">
+
+  <div class="hero-card" *ngIf="stats() as s">
+    <div class="hero-icon"><mat-icon>person</mat-icon></div>
+    <div class="hero-text">
+      <div class="hero-greeting">Welcome back,</div>
+      <div class="hero-name">{{ s.driverName }}</div>
+      <div class="hero-meta">Salary per trip: ₹{{ s.salaryPerTrip | number:'1.2-2' }}</div>
+    </div>
+  </div>
+
+  <div class="stats-grid" *ngIf="stats() as s">
+    <mat-card class="stat-card accent-blue">
+      <mat-card-content>
+        <div class="stat-row">
+          <div>
+            <div class="stat-label">Total Trips</div>
+            <div class="stat-value">{{ s.totalTrips }}</div>
+            <div class="stat-sub">{{ s.completedTrips }} completed · {{ s.inProgressTrips }} active · {{ s.pendingTrips }} pending</div>
+          </div>
+          <mat-icon class="stat-icon">directions_car</mat-icon>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card accent-green">
+      <mat-card-content>
+        <div class="stat-row">
+          <div>
+            <div class="stat-label">Total Earnings</div>
+            <div class="stat-value">₹{{ s.totalEarnings | number:'1.2-2' }}</div>
+            <div class="stat-sub">From {{ s.completedTrips }} completed trip(s)</div>
+          </div>
+          <mat-icon class="stat-icon">payments</mat-icon>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card accent-orange">
+      <mat-card-content>
+        <div class="stat-row">
+          <div>
+            <div class="stat-label">This Month</div>
+            <div class="stat-value">{{ s.thisMonthTrips }} trips</div>
+            <div class="stat-sub">{{ s.thisMonthCompleted }} completed</div>
+          </div>
+          <mat-icon class="stat-icon">calendar_month</mat-icon>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card accent-purple">
+      <mat-card-content>
+        <div class="stat-row">
+          <div>
+            <div class="stat-label">This Month Earnings</div>
+            <div class="stat-value">₹{{ s.thisMonthEarnings | number:'1.2-2' }}</div>
+            <div class="stat-sub">₹{{ s.salaryPerTrip | number:'1.2-2' }} × {{ s.thisMonthCompleted }}</div>
+          </div>
+          <mat-icon class="stat-icon">trending_up</mat-icon>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <div class="trips-section">
+    <div class="section-header">
+      <h2><mat-icon>list_alt</mat-icon> My Trips</h2>
+      <mat-button-toggle-group [value]="statusFilter()" (change)="setStatusFilter($event.value)">
+        <mat-button-toggle value="">All</mat-button-toggle>
+        <mat-button-toggle value="PENDING">Pending</mat-button-toggle>
+        <mat-button-toggle value="STARTED">Active</mat-button-toggle>
+        <mat-button-toggle value="COMPLETED">Completed</mat-button-toggle>
+      </mat-button-toggle-group>
+    </div>
+
+    <mat-progress-bar *ngIf="loading()" mode="indeterminate"></mat-progress-bar>
+
+    <div class="table-wrap">
+      <table mat-table [dataSource]="trips()" class="mat-elevation-z1">
+
+        <ng-container matColumnDef="id">
+          <th mat-header-cell *matHeaderCellDef>ID</th>
+          <td mat-cell *matCellDef="let t">{{ t.id }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="tripDate">
+          <th mat-header-cell *matHeaderCellDef>Date</th>
+          <td mat-cell *matCellDef="let t">{{ t.tripDate }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="truck">
+          <th mat-header-cell *matHeaderCellDef>Truck</th>
+          <td mat-cell *matCellDef="let t">{{ t.truck.truckNumber }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="route">
+          <th mat-header-cell *matHeaderCellDef>Route</th>
+          <td mat-cell *matCellDef="let t">
+            <div class="route">
+              <span>{{ t.sourceLocation }}</span>
+              <mat-icon class="route-arrow">arrow_forward</mat-icon>
+              <span>{{ t.destinationLocation }}</span>
+            </div>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="sandType">
+          <th mat-header-cell *matHeaderCellDef>Cargo</th>
+          <td mat-cell *matCellDef="let t">{{ t.sandType.name }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="tons">
+          <th mat-header-cell *matHeaderCellDef>Tons</th>
+          <td mat-cell *matCellDef="let t">{{ t.tons }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="mySalary">
+          <th mat-header-cell *matHeaderCellDef>My Salary (₹)</th>
+          <td mat-cell *matCellDef="let t">
+            <strong [class.muted]="t.status !== 'COMPLETED'">
+              {{ stats()?.salaryPerTrip | number:'1.2-2' }}
+            </strong>
+            <div class="salary-sub" *ngIf="t.status !== 'COMPLETED'">pending</div>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="status">
+          <th mat-header-cell *matHeaderCellDef>Status</th>
+          <td mat-cell *matCellDef="let t">
+            <span class="status-chip" [attr.data-status]="t.status">{{ t.status }}</span>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+
+        <tr class="mat-row" *matNoDataRow>
+          <td class="mat-cell empty-row" [attr.colspan]="displayedColumns.length">
+            <mat-icon class="empty-icon">inbox</mat-icon>
+            <div>No trips assigned yet.</div>
+          </td>
+        </tr>
+      </table>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,163 @@
+<div class="dealer-requests-page">
+
+  <div class="page-header">
+    <h1><mat-icon>send</mat-icon> Request a Trip</h1>
+    <p class="subtitle">Submit a request to the fleet admin. They'll review, approve, and dispatch.</p>
+  </div>
+
+  <!-- ========== REQUEST FORM ========== -->
+  <mat-card class="form-card">
+    <mat-card-header>
+      <mat-card-title>New Request</mat-card-title>
+      <mat-card-subtitle>Fill in the details and submit</mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <form [formGroup]="form" (ngSubmit)="submit()" class="request-form">
+        <div class="row two-col">
+          <mat-form-field appearance="outline">
+            <mat-label>Sand Type</mat-label>
+            <mat-select formControlName="sandTypeId">
+              <mat-option *ngFor="let s of sandTypes()" [value]="s.id">
+                {{ s.name }} — ₹{{ s.pricePerTon | number:'1.2-2' }}/ton
+              </mat-option>
+            </mat-select>
+            <mat-error *ngIf="form.controls.sandTypeId.hasError('required')">Required</mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Tons Needed</mat-label>
+            <input matInput type="number" step="0.1" min="0.01" formControlName="tons" />
+            <mat-error *ngIf="form.controls.tons.hasError('required')">Required</mat-error>
+            <mat-error *ngIf="form.controls.tons.hasError('min')">Must be greater than zero</mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="row">
+          <mat-form-field appearance="outline" class="full">
+            <mat-label>Pickup Location (where sand comes from)</mat-label>
+            <input matInput formControlName="sourceLocation" placeholder="e.g. Quarry A, Hyderabad" />
+            <mat-error *ngIf="form.controls.sourceLocation.hasError('required')">Required</mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="row">
+          <mat-form-field appearance="outline" class="full">
+            <mat-label>Delivery Location (where to deliver)</mat-label>
+            <input matInput formControlName="destinationLocation" placeholder="e.g. Site 5, Secunderabad" />
+            <mat-error *ngIf="form.controls.destinationLocation.hasError('required')">Required</mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="row two-col">
+          <mat-form-field appearance="outline">
+            <mat-label>Preferred Date</mat-label>
+            <input matInput type="date" formControlName="requestedDate" [min]="todayIso()" />
+            <mat-error *ngIf="form.controls.requestedDate.hasError('required')">Required</mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Notes (optional)</mat-label>
+            <input matInput formControlName="notes" placeholder="Any special instructions" maxlength="2000" />
+          </mat-form-field>
+        </div>
+
+        <div class="estimated-box">
+          <span class="label">Estimated cost:</span>
+          <span class="value">₹{{ estimatedTotal() | number:'1.2-2' }}</span>
+          <span class="hint">final amount confirmed at trip dispatch</span>
+        </div>
+
+        <div class="actions">
+          <button type="submit" mat-flat-button color="primary"
+                  [disabled]="form.invalid || submitting()">
+            <mat-spinner *ngIf="submitting()" diameter="18"></mat-spinner>
+            <span *ngIf="!submitting()">
+              <mat-icon>send</mat-icon>
+              Submit Request
+            </span>
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- ========== MY REQUESTS LIST ========== -->
+  <div class="list-section">
+    <h2><mat-icon>history</mat-icon> My Requests</h2>
+
+    <mat-progress-bar *ngIf="loading()" mode="indeterminate"></mat-progress-bar>
+
+    <div class="table-wrap">
+      <table mat-table [dataSource]="requests()" class="mat-elevation-z1">
+        <ng-container matColumnDef="id">
+          <th mat-header-cell *matHeaderCellDef>ID</th>
+          <td mat-cell *matCellDef="let r">#{{ r.id }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="requestedDate">
+          <th mat-header-cell *matHeaderCellDef>Requested for</th>
+          <td mat-cell *matCellDef="let r">{{ r.requestedDate }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="sandType">
+          <th mat-header-cell *matHeaderCellDef>Sand Type</th>
+          <td mat-cell *matCellDef="let r">{{ r.sandType.name }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="tons">
+          <th mat-header-cell *matHeaderCellDef>Tons</th>
+          <td mat-cell *matCellDef="let r">{{ r.tons }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="estimatedAmount">
+          <th mat-header-cell *matHeaderCellDef>Estimated (₹)</th>
+          <td mat-cell *matCellDef="let r">{{ r.estimatedAmount | number:'1.2-2' }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="route">
+          <th mat-header-cell *matHeaderCellDef>Route</th>
+          <td mat-cell *matCellDef="let r" class="route-cell">
+            {{ r.sourceLocation }} → {{ r.destinationLocation }}
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="status">
+          <th mat-header-cell *matHeaderCellDef>Status</th>
+          <td mat-cell *matCellDef="let r">
+            <span class="status-chip" [attr.data-status]="r.status">{{ r.status }}</span>
+            <div class="admin-note" *ngIf="r.adminNotes && (r.status === 'REJECTED' || r.status === 'APPROVED')">
+              <strong>Admin:</strong> {{ r.adminNotes }}
+            </div>
+            <div class="trip-link" *ngIf="r.approvedTripId">
+              ✓ Trip #{{ r.approvedTripId }} scheduled
+            </div>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef>Actions</th>
+          <td mat-cell *matCellDef="let r">
+            <button mat-stroked-button color="warn"
+                    *ngIf="r.status === 'PENDING'"
+                    (click)="cancel(r)">
+              <mat-icon>cancel</mat-icon>
+              Cancel
+            </button>
+            <span *ngIf="r.status !== 'PENDING'" class="muted">—</span>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+
+        <tr class="mat-row" *matNoDataRow>
+          <td class="mat-cell empty-row" [attr.colspan]="displayedColumns.length">
+            <mat-icon class="empty-icon">inbox</mat-icon>
+            <div>No requests yet. Submit your first request using the form above.</div>
+          </td>
+        </tr>
+      </table>
+    </div>
+  </div>
+</div>

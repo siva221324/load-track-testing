@@ -1,0 +1,82 @@
+<div class="trucks-page">
+  <div class="page-header">
+    <h1>Trucks</h1>
+    <button mat-flat-button color="primary" (click)="add()">
+      <mat-icon>add</mat-icon>
+      Add Truck
+    </button>
+  </div>
+
+  <div class="toolbar">
+    <mat-form-field appearance="outline" class="search-field">
+      <mat-label>Search by truck number or model</mat-label>
+      <input matInput #searchInput (keyup.enter)="applySearch(searchInput.value)" />
+      <button matSuffix mat-icon-button (click)="applySearch(searchInput.value)" aria-label="Search">
+        <mat-icon>search</mat-icon>
+      </button>
+    </mat-form-field>
+  </div>
+
+  <div class="table-wrap">
+    <mat-progress-bar *ngIf="loading()" mode="indeterminate"></mat-progress-bar>
+
+    <table mat-table [dataSource]="data()" matSort (matSortChange)="onSort($event)" class="mat-elevation-z1">
+
+      <ng-container matColumnDef="id">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>ID</th>
+        <td mat-cell *matCellDef="let t">{{ t.id }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="truckNumber">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header="truckNumber">Truck Number</th>
+        <td mat-cell *matCellDef="let t">{{ t.truckNumber }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="model">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header="model">Model</th>
+        <td mat-cell *matCellDef="let t">{{ t.model }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="capacityTons">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header="capacityTons">Capacity (tons)</th>
+        <td mat-cell *matCellDef="let t">{{ t.capacityTons }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="status">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header="status">Status</th>
+        <td mat-cell *matCellDef="let t">
+          <span class="status-chip" [attr.data-status]="t.status">{{ t.status }}</span>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef class="actions-col">Actions</th>
+        <td mat-cell *matCellDef="let t" class="actions-col">
+          <button mat-icon-button (click)="edit(t)" aria-label="Edit">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button color="warn" (click)="remove(t)" aria-label="Delete">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+
+      <tr class="mat-row" *matNoDataRow>
+        <td class="mat-cell empty-row" [attr.colspan]="displayedColumns.length">
+          No trucks found.
+        </td>
+      </tr>
+    </table>
+
+    <mat-paginator
+      [length]="totalElements()"
+      [pageSize]="pageSize"
+      [pageSizeOptions]="[5, 10, 20, 50]"
+      [pageIndex]="pageIndex"
+      (page)="onPage($event)">
+    </mat-paginator>
+  </div>
+</div>
