@@ -11,6 +11,7 @@ import java.util.List;
  * Uses centralized DataProviders from utilities.TestDataProviders.
  */
 public class LoginTests extends BaseTest {
+
     @Test(dataProvider = "validLoginData", dataProviderClass = TestDataProviders.class)
     public void testValidLogin(String username, String password, String role, String expectedRoute) throws InterruptedException {
         LoginPage login = new LoginPage(driver);
@@ -56,7 +57,7 @@ public class LoginTests extends BaseTest {
             Assert.assertFalse(errors.isEmpty(), "Expected validation errors for empty fields");
         }
     }
-    @Test(dataProvider = "invalidLoginCredentialsData", dataProviderClass = TestDataProviders.class)
+  @Test(dataProvider = "invalidLoginCredentialsData", dataProviderClass = TestDataProviders.class)
     public void testInvalidCredentials(String username, String password, String role) throws InterruptedException {
         LoginPage login = new LoginPage(driver);
         // Select role

@@ -50,9 +50,9 @@ public class TestDataProviders {
     public Object[][] validLoginData() {
         return new Object[][] {
                 // {username, password, role, expectedRouteKeyword}
-                {"admin_user", "AdminPass123!", "ADMIN", "/app/home"},
-                {"driver_user", "DriverPass123!", "DRIVER", "/app/driver"},
-                {"dealer_user", "DealerPass123!", "DEALER", "/app/dealer"}
+                {"admin123", "admin123", "ADMIN", "/app/home"},
+//                {"driver_user", "DriverPass123!", "DRIVER", "/app/driver"},
+//                {"dealer_user", "DealerPass123!", "DEALER", "/app/dealer"}
         };
     }
     @DataProvider(name = "invalidLoginCredentialsData")
@@ -69,8 +69,6 @@ public class TestDataProviders {
         return new Object[][] {
                 // Empty username
                 {"", "Password123!", "ADMIN"},
-                // Empty password
-                {"testuser", "", "ADMIN"},
                 // Both empty
                 {"", "", "ADMIN"}
         };

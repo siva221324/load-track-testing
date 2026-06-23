@@ -1,0 +1,39 @@
+2026-06-23 16:54:06 INFO  [main] Utils:112 - [TestNG] Running:
+  C:\Users\2494455\OneDrive - Cognizant\Desktop\LoadTruck_Testing\testng.xml
+
+2026-06-23 16:54:06 INFO  [main] BaseTest:50 - Loaded test config from src\test\resources\config.properties
+2026-06-23 16:54:12 INFO  [main] BaseTest:77 - Navigating to http://localhost:4200
+2026-06-23 16:54:17 INFO  [main] BaseTest:129 - Saved screenshot: target\screenshots\testValidLogin_20260623_165417.png
+2026-06-23 16:55:48 INFO  [main] Utils:112 - [TestNG] Running:
+  C:\Users\2494455\OneDrive - Cognizant\Desktop\LoadTruck_Testing\testng.xml
+
+2026-06-23 16:55:48 INFO  [main] BaseTest:50 - Loaded test config from src\test\resources\config.properties
+2026-06-23 16:55:51 INFO  [main] BaseTest:77 - Navigating to https://loadtrack-gamma.vercel.app/login
+2026-06-23 16:56:58 INFO  [main] Utils:112 - [TestNG] Running:
+  C:\Users\2494455\OneDrive - Cognizant\Desktop\LoadTruck_Testing\testng.xml
+
+2026-06-23 16:56:58 INFO  [main] BaseTest:50 - Loaded test config from src\test\resources\config.properties
+2026-06-23 16:57:01 INFO  [main] BaseTest:77 - Navigating to https://loadtrack-gamma.vercel.app/login
+2026-06-23 16:57:09 INFO  [main] BaseTest:77 - Navigating to https://loadtrack-gamma.vercel.app/login
+2026-06-23 16:57:13 INFO  [main] BaseTest:129 - Saved screenshot: target\screenshots\testInvalidLoginStaysOnLoginPage_20260623_165712.png
+2026-06-23 16:57:19 INFO  [main] BaseTest:77 - Navigating to https://loadtrack-gamma.vercel.app/login
+2026-06-23 16:57:26 INFO  [main] BaseTest:77 - Navigating to https://loadtrack-gamma.vercel.app/login
+2026-06-23 16:57:32 INFO  [main] BaseTest:129 - Saved screenshot: target\screenshots\testValidLogin_20260623_165732.png
+2026-06-23 17:01:41 INFO  [main] Utils:112 - [TestNG] Running:
+  C:\Users\2494455\OneDrive - Cognizant\Desktop\LoadTruck_Testing\testng.xml
+
+2026-06-23 17:01:41 INFO  [main] BaseTest:50 - Loaded test config from src\test\resources\config.properties
+2026-06-23 17:01:45 INFO  [main] BaseTest:77 - Navigating to https://loadtrack-gamma.vercel.app/login
+2026-06-23 17:01:53 INFO  [main] BaseTest:77 - Navigating to https://loadtrack-gamma.vercel.app/login
+2026-06-23 17:01:56 INFO  [main] BaseTest:129 - Saved screenshot: target\screenshots\testInvalidLoginStaysOnLoginPage_20260623_170155.png
+2026-06-23 17:02:01 INFO  [main] BaseTest:77 - Navigating to https://loadtrack-gamma.vercel.app/login
+2026-06-23 17:02:08 INFO  [main] BaseTest:77 - Navigating to https://loadtrack-gamma.vercel.app/login
+2026-06-23 17:04:10 INFO  [main] Utils:112 - [TestNG] Running:
+  C:\Users\2494455\OneDrive - Cognizant\Desktop\LoadTruck_Testing\testng.xml
+
+2026-06-23 17:04:10 INFO  [main] BaseTest:50 - Loaded test config from src\test\resources\config.properties
+2026-06-23 17:04:14 INFO  [main] BaseTest:77 - Navigating to https://loadtrack-gamma.vercel.app/login
+2026-06-23 17:04:24 INFO  [main] BaseTest:77 - Navigating to https://loadtrack-gamma.vercel.app/login
+2026-06-23 17:04:34 INFO  [main] BaseTest:77 - Navigating to https://loadtrack-gamma.vercel.app/login
+2026-06-23 17:04:42 INFO  [main] BaseTest:77 - Navigating to https://loadtrack-gamma.vercel.app/login
+2026-06-23 17:04:55 INFO  [main] BaseTest:77 - Navigating to https://loadtrack-gamma.vercel.app/login
