@@ -1,7 +1,9 @@
 package pageObjects;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -77,8 +79,8 @@ public class DealerPage {
     }
 
     public void openEditDialog(String phone) {
-        WebElement row = waitForDealerRow(phone);
-        row.findElement(By.cssSelector("button[aria-label='Edit']")).click();
+        // Use retry to handle Angular table re-renders that stale the element before click lands
+        clickWithRetry(dealerActionButton(phone, "Edit"));
         wait.until(ExpectedConditions.visibilityOfElementLocated(dialog));
     }
 
@@ -99,14 +101,19 @@ public class DealerPage {
 
     public void search(String searchText) {
         WebElement input = wait.until(ExpectedConditions.visibilityOfElementLocated(searchInput));
-        input.click();
+        // Use JS click to bypass the floating mat-label that intercepts normal clicks
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", input);
         input.sendKeys(Keys.chord(Keys.CONTROL, "a"));
         input.sendKeys(searchText);
-        wait.until(ExpectedConditions.elementToBeClickable(searchButton)).click();
+        WebElement btn = wait.until(ExpectedConditions.visibilityOfElementLocated(searchButton));
+        // Use JS click to bypass the sticky mat-toolbar that intercepts normal clicks
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", btn);
     }
 
     public WebElement waitForDealerRow(String phone) {
-        return wait.until(ExpectedConditions.visibilityOfElementLocated(dealerRow(phone)));
+        // Always re-locate row to get a fresh reference (table may re-render after search)
+        return wait.until(ExpectedConditions.refreshed(
+                ExpectedConditions.visibilityOfElementLocated(dealerRow(phone))));
     }
 
     public String getDealerRowText(String phone) {
@@ -118,8 +125,8 @@ public class DealerPage {
     }
 
     public void deleteDealer(String phone) {
-        WebElement row = waitForDealerRow(phone);
-        row.findElement(By.cssSelector("button[aria-label='Delete']")).click();
+        // Use retry to handle Angular table re-renders that stale the element before click lands
+        clickWithRetry(dealerActionButton(phone, "Delete"));
 
         By deleteDialog = By.xpath("//mat-dialog-container[.//h2[normalize-space()='Delete Dealer']]");
         wait.until(ExpectedConditions.visibilityOfElementLocated(deleteDialog));
@@ -132,7 +139,8 @@ public class DealerPage {
 
     private void replace(By locator, String value) {
         WebElement input = wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
-        input.click();
+        // Use JS click to bypass the floating mat-label that intercepts normal clicks
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", input);
         input.sendKeys(Keys.chord(Keys.CONTROL, "a"));
         input.sendKeys(value);
     }
@@ -147,5 +155,26 @@ public class DealerPage {
 
     private By dealerRow(String phone) {
         return By.xpath("//table[@mat-table]//tr[.//td[normalize-space()='" + phone + "']]");
+    }
+
+    private By dealerActionButton(String phone, String ariaLabel) {
+        return By.xpath("//table[@mat-table]//tr[.//td[normalize-space()='" + phone + "']]//button[@aria-label='" + ariaLabel + "']");
+    }
+
+    /**
+     * Clicks a button by locator with up to 3 retries on StaleElementReferenceException.
+     * Needed because Angular may re-render the table between elementToBeClickable() returning
+     * and the actual .click() call, making the reference stale.
+     */
+    private void clickWithRetry(By locator) {
+        int attempts = 0;
+        while (true) {
+            try {
+                wait.until(ExpectedConditions.elementToBeClickable(locator)).click();
+                return;
+            } catch (StaleElementReferenceException e) {
+                if (++attempts >= 3) throw e;
+            }
+        }
     }
 }

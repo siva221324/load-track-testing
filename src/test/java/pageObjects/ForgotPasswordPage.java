@@ -1,6 +1,7 @@
 package pageObjects;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -44,14 +45,16 @@ public class ForgotPasswordPage {
 
     public void enterUsername(String username) {
         WebElement input = wait.until(ExpectedConditions.visibilityOfElementLocated(usernameInput));
-        input.click();
+        // Use JS click to bypass the floating mat-label that intercepts normal clicks
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", input);
         input.sendKeys(Keys.chord(Keys.CONTROL, "a"));
         input.sendKeys(username);
     }
 
     public void touchUsername() {
         WebElement input = wait.until(ExpectedConditions.visibilityOfElementLocated(usernameInput));
-        input.click();
+        // Use JS click to bypass the floating mat-label that intercepts normal clicks
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", input);
         input.sendKeys(Keys.TAB);
     }
 

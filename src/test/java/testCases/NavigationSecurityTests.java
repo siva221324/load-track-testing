@@ -80,7 +80,7 @@ public class NavigationSecurityTests extends BaseTest {
         assertRoleRestricted("/app/trucks");
         assertRoleRestricted("/app/dealer");
         assertRoleRestricted("/app/trip-requests");
-        assertRoleRestricted("/app/home");
+        // /app/home has no roleGuard — all authenticated users can access it
 
         loginAsAdmin();
         deleteDriver(data);
@@ -102,7 +102,7 @@ public class NavigationSecurityTests extends BaseTest {
         assertRoleRestricted("/app/payments");
         assertRoleRestricted("/app/driver");
         assertRoleRestricted("/app/settings");
-        assertRoleRestricted("/app/home");
+        // /app/home has no roleGuard — all authenticated users can access it
 
         loginAsAdmin();
         deleteDealer(data);

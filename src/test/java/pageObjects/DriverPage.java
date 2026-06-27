@@ -1,7 +1,9 @@
 package pageObjects;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -84,8 +86,8 @@ public class DriverPage {
     }
 
     public void openEditDialog(String licenseNumber) {
-        WebElement row = waitForDriverRow(licenseNumber);
-        row.findElement(By.cssSelector("button[aria-label='Edit']")).click();
+        // Use retry to handle Angular table re-renders that stale the element before click lands
+        clickWithRetry(driverActionButton(licenseNumber, "Edit"));
         wait.until(ExpectedConditions.visibilityOfElementLocated(dialog));
     }
 
@@ -109,14 +111,19 @@ public class DriverPage {
 
     public void search(String searchText) {
         WebElement input = wait.until(ExpectedConditions.visibilityOfElementLocated(searchInput));
-        input.click();
+        // Use JS click to bypass the floating mat-label that intercepts normal clicks
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", input);
         input.sendKeys(Keys.chord(Keys.CONTROL, "a"));
         input.sendKeys(searchText);
-        wait.until(ExpectedConditions.elementToBeClickable(searchButton)).click();
+        WebElement btn = wait.until(ExpectedConditions.visibilityOfElementLocated(searchButton));
+        // Use JS click to bypass the sticky mat-toolbar that intercepts normal clicks
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", btn);
     }
 
     public WebElement waitForDriverRow(String licenseNumber) {
-        return wait.until(ExpectedConditions.visibilityOfElementLocated(driverRow(licenseNumber)));
+        // Always re-locate row to get a fresh reference (table may re-render after search)
+        return wait.until(ExpectedConditions.refreshed(
+                ExpectedConditions.visibilityOfElementLocated(driverRow(licenseNumber))));
     }
 
     public String getDriverRowText(String licenseNumber) {
@@ -128,8 +135,8 @@ public class DriverPage {
     }
 
     public void deleteDriver(String licenseNumber) {
-        WebElement row = waitForDriverRow(licenseNumber);
-        row.findElement(By.cssSelector("button[aria-label='Delete']")).click();
+        // Use retry to handle Angular table re-renders that stale the element before click lands
+        clickWithRetry(driverActionButton(licenseNumber, "Delete"));
 
         By deleteDialog = By.xpath("//mat-dialog-container[.//h2[normalize-space()='Delete Driver']]");
         wait.until(ExpectedConditions.visibilityOfElementLocated(deleteDialog));
@@ -142,7 +149,8 @@ public class DriverPage {
 
     private void replace(By locator, String value) {
         WebElement input = wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
-        input.click();
+        // Use JS click to bypass the floating mat-label that intercepts normal clicks
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", input);
         input.sendKeys(Keys.chord(Keys.CONTROL, "a"));
         input.sendKeys(value);
     }
@@ -157,5 +165,26 @@ public class DriverPage {
 
     private By driverRow(String licenseNumber) {
         return By.xpath("//table[@mat-table]//tr[.//td[normalize-space()='" + licenseNumber + "']]");
+    }
+
+    private By driverActionButton(String licenseNumber, String ariaLabel) {
+        return By.xpath("//table[@mat-table]//tr[.//td[normalize-space()='" + licenseNumber + "']]//button[@aria-label='" + ariaLabel + "']");
+    }
+
+    /**
+     * Clicks a button by locator with up to 3 retries on StaleElementReferenceException.
+     * Needed because Angular may re-render the table between elementToBeClickable() returning
+     * and the actual .click() call, making the reference stale.
+     */
+    private void clickWithRetry(By locator) {
+        int attempts = 0;
+        while (true) {
+            try {
+                wait.until(ExpectedConditions.elementToBeClickable(locator)).click();
+                return;
+            } catch (StaleElementReferenceException e) {
+                if (++attempts >= 3) throw e;
+            }
+        }
     }
 }

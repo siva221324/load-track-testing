@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="All Test Suite">
+    <listeners>
+        <listener class-name="utilities.ExtentTestNGListener"/>
+    </listeners>
+    <test verbose="2" preserve-order="true"
+          name="C:/Users/tsiva/Downloads/load-track-testing-main/load-track-testing-main/src">
+        <classes>
+            <class name="testCases.DealerPortalTests">
+                <methods>
+                    <include name="testDealerPortalLocatorsAndPendingPayment"/>
+                    <include name="testDealerPortalPaidPaymentAndStats"/>
+                </methods>
+            </class>
+            <class name="testCases.DealerTests">
+                <methods>
+                    <include name="testDealerPageLocators"/>
+                    <include name="testCreateDealer"/>
+                    <include name="testEditDealer"/>
+                    <include name="testDeleteDealer"/>
+                </methods>
+            </class>
+            <class name="testCases.DriverPortalTests">
+                <methods>
+                    <include name="testDriverPortalLocatorsAndPendingTrip"/>
+                    <include name="testDriverPortalCompletedTripAndEarnings"/>
+                </methods>
+            </class>
+            <class name="testCases.DriverTests">
+                <methods>
+                    <include name="testDriverPageLocators"/>
+                    <include name="testCreateDriver"/>
+                    <include name="testEditDriver"/>
+                    <include name="testDeleteDriver"/>
+                </methods>
+            </class>
+            <class name="testCases.ForgotPasswordTests">
+                <methods>
+                    <include name="testForgotPasswordLocators"/>
+                    <include name="testForgotPasswordRequiredValidation"/>
+                    <include name="testForgotPasswordUnknownUsername"/>
+                    <include name="testResetPasswordAndLoginWithTemporaryPassword"/>
+                </methods>
+            </class>
+            <class name="testCases.LoginTests">
+                <methods>
+                    <include name="testValidLogin"/>
+                    <include name="testInvalidLoginStaysOnLoginPage"/>
+                    <include name="testInvalidCredentials"/>
+                </methods>
+            </class>
+            <class name="testCases.NavigationSecurityTests">
+                <methods>
+                    <include name="testUnauthenticatedRoutesRedirectToLogin"/>
+                    <include name="testAdminNavigationLogoutAndRoleRestrictions"/>
+                    <include name="testDriverNavigationAndRoleRestrictions"/>
+                    <include name="testDealerNavigationAndRoleRestrictions"/>
+                </methods>
+            </class>
+            <class name="testCases.PaymentTests">
+                <methods>
+                    <include name="testPaymentPageLocators"/>
+                    <include name="testRecordPartialPayment"/>
+                    <include name="testRecordFullPayment"/>
+                    <include name="testInvalidPaymentValidation"/>
+                </methods>
+            </class>
+            <class name="testCases.ReceiptTests">
+                <methods>
+                    <include name="testDownloadReceiptPdf"/>
+                </methods>
+            </class>
+            <class name="testCases.ReportsTests">
+                <methods>
+                    <include name="testReportsPageLocators"/>
+                    <include name="testTripsReportAndExports"/>
+                    <include name="testPaymentsReportAndExports"/>
+                </methods>
+            </class>
+            <class name="testCases.SandTypeTests">
+                <methods>
+                    <include name="testSandTypePageLocators"/>
+                    <include name="testCreateSandType"/>
+                    <include name="testEditSandType"/>
+                    <include name="testDeleteSandType"/>
+                </methods>
+            </class>
+            <class name="testCases.SettingsTests">
+                <methods>
+                    <include name="testSettingsPageLocators"/>
+                    <include name="testUpdateSettings"/>
+                    <include name="testInvalidSettingsValidation"/>
+                </methods>
+            </class>
+            <class name="testCases.SignupTests">
+                <methods>
+                    <include name="testValidSignup"/>
+                    <include name="testInvalidSignupStaysOnPage"/>
+                    <include name="testEmptyFieldsValidation"/>
+                    <include name="testDuplicateUsernameRegistration"/>
+                </methods>
+            </class>
+            <class name="testCases.TripRequestTests">
+                <methods>
+                    <include name="testAdminTripRequestLocators"/>
+                    <include name="testDealerSubmitAndCancelRequest"/>
+                    <include name="testAdminRejectRequest"/>
+                    <include name="testAdminApproveRequest"/>
+                </methods>
+            </class>
+            <class name="testCases.TripTests">
+                <methods>
+                    <include name="testTripManagementLocators"/>
+                    <include name="testCreateTrip"/>
+                    <include name="testEditTrip"/>
+                    <include name="testTripStatusWorkflow"/>
+                    <include name="testDeleteTrip"/>
+                </methods>
+            </class>
+            <class name="testCases.TruckTests">
+                <methods>
+                    <include name="testTruckPageLocators"/>
+                    <include name="testCreateTruck"/>
+                    <include name="testEditTruck"/>
+                    <include name="testDeleteTruck"/>
+                </methods>
+            </class>
+        </classes>
+    </test>
+</suite>

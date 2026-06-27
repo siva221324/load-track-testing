@@ -1,7 +1,9 @@
 package pageObjects;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -77,8 +79,8 @@ public class ReportsPage {
 
     public void runTripsReport(String date, String truckNumber, String driverName,
                                String dealerName, String statusLabel) {
-        replace(tripFrom, date);
-        replace(tripTo, date);
+        enterTripDate(tripFrom, date);
+        enterTripDate(tripTo, date);
         selectOption(tripTruck, truckNumber);
         selectOption(tripDriver, driverName);
         selectOption(tripDealer, dealerName);
@@ -94,8 +96,8 @@ public class ReportsPage {
     }
 
     public void runPaymentsReport(String date, String dealerName, String statusLabel) {
-        replace(paymentFrom, date);
-        replace(paymentTo, date);
+        enterTripDate(paymentFrom, date);
+        enterTripDate(paymentTo, date);
         selectOption(paymentDealer, dealerName);
         selectOption(paymentStatus, statusLabel);
         wait.until(ExpectedConditions.elementToBeClickable(paymentRunButton)).click();
@@ -130,10 +132,31 @@ public class ReportsPage {
     }
 
     private void replace(By locator, String value) {
+        int attempts = 0;
+        while (true) {
+            try {
+                WebElement input = wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
+                // Use JS click to bypass the floating mat-label that intercepts normal clicks
+                ((JavascriptExecutor) driver).executeScript("arguments[0].click();", input);
+                input.sendKeys(Keys.chord(Keys.CONTROL, "a"));
+                input.sendKeys(value);
+                return;
+            } catch (StaleElementReferenceException e) {
+                if (++attempts >= 3) throw e;
+            }
+        }
+    }
+
+    private void enterTripDate(By locator, String isoDate) {
         WebElement input = wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
-        input.click();
-        input.sendKeys(Keys.chord(Keys.CONTROL, "a"));
-        input.sendKeys(value);
+        JavascriptExecutor js = (JavascriptExecutor) driver;
+        js.executeScript(
+            "var s=Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype,'value').set;" +
+            "s.call(arguments[0],arguments[1]);" +
+            "arguments[0].dispatchEvent(new Event('input',{bubbles:true}));" +
+            "arguments[0].dispatchEvent(new Event('change',{bubbles:true}));",
+            input, isoDate);
+        input.sendKeys(Keys.TAB);
     }
 
     private boolean isDisplayed(By locator) {

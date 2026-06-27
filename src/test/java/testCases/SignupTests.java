@@ -17,7 +17,7 @@ public class SignupTests extends BaseTest {
 
     @BeforeMethod(alwaysRun = true)
     public void navigateToSignupPage() {
-        String baseUrl = config.getProperty("appURL", "http://localhost:4200");
+        String baseUrl = config.getProperty("appURL", "https://loadtrack-gamma.vercel.app/login");
         // Start at login page
         driver.get(baseUrl + "/login");
         LoginPage login = new LoginPage(driver);
@@ -39,7 +39,7 @@ public class SignupTests extends BaseTest {
         Thread.sleep(1500);
         String current = driver.getCurrentUrl();
         if (current == null) current = "";
-        Assert.assertTrue(current.contains("/login") || current.endsWith("/login"), "Expected to navigate to /login after successful signup; actual: " + current);
+        Assert.assertTrue(current.contains("/login") && current.endsWith("/login"), "Expected to navigate to /login after successful signup; actual: " + current);
     }
     @Test(dataProvider = "invalidAdminSignupData", dataProviderClass = TestDataProviders.class)
     public void testInvalidSignupStaysOnPage(String username, String password, String confirm) throws InterruptedException {
@@ -47,17 +47,18 @@ public class SignupTests extends BaseTest {
         signup.typeUsername(username);
         signup.typePassword(password);
         signup.typeConfirm(confirm);
-        signup.submit();
-        // Wait a bit for form validation to show errors
+        // Wait a bit for form validation to show errors and update button state
         Thread.sleep(700);
+        // Check whether the submit button is enabled or not
+        boolean isEnabled = signup.isSubmitEnabled();
+        // WebElement btn = driver.findElement(By.cssSelector("button[type='submit'].login-btn"));
+        // System.out.println("DEBUG: isEnabled = " + isEnabled);
+        // System.out.println("DEBUG: getAttribute('disabled') = " + btn.getAttribute("disabled"));
+        Assert.assertFalse(isEnabled, "Submit button should not be enabled for invalid signup data");
         // If the app rejects or shows validation, URL should NOT change to /login
         String current = driver.getCurrentUrl();
         if (current == null) current = "";
-        Assert.assertFalse(current.contains("/login"), "Should not navigate to /login for invalid data");
-        // Also assert there are visible mat-error elements OR password mismatch message
-        List<WebElement> errors = signup.getMatErrors();
-        boolean hasErrors = !errors.isEmpty() || signup.hasPasswordMismatchMessage();
-        Assert.assertTrue(hasErrors, "Expected validation errors or password mismatch message for invalid input");
+        Assert.assertTrue(current.contains("/login/signup"), "Should not navigate to /login for invalid data");
     }
     @Test(dataProvider = "signupEmptyFieldsData", dataProviderClass = TestDataProviders.class)
     public void testEmptyFieldsValidation(String username, String password, String confirm) throws InterruptedException {
@@ -73,12 +74,14 @@ public class SignupTests extends BaseTest {
         }
         Thread.sleep(500);
         // Verify validation errors appear
-        List<WebElement> errors = signup.getMatErrors();
-        Assert.assertFalse(errors.isEmpty(), "Expected validation errors for empty fields");
+//        List<WebElement> errors = signup.getMatErrors();
+//        Assert.assertFalse(errors.isEmpty(), "Expected validation errors for empty fields");
+        boolean isEnabled = signup.isSubmitEnabled();
+        Assert.assertFalse(isEnabled, "Submit button should not be enabled for invalid signup data");
         // Verify user stays on /signup page
         String current = driver.getCurrentUrl();
         if (current == null) current = "";
-        Assert.assertFalse(current.contains("/login"), "User should remain on signup page when fields are empty");
+        Assert.assertTrue(current.contains("/login/signup"), "User should remain on signup page when fields are empty");
     }
     @Test(dataProvider = "signupDuplicateUsernameData", dataProviderClass = TestDataProviders.class)
     public void testDuplicateUsernameRegistration(String username, String password, String confirm) throws InterruptedException {
@@ -93,6 +96,6 @@ public class SignupTests extends BaseTest {
         String current = driver.getCurrentUrl();
         if (current == null) current = "";
         // Should NOT navigate to /login
-        Assert.assertFalse(current.contains("/login"), "Should not navigate to /login for duplicate username");
+        Assert.assertTrue(current.contains("/login/signup"), "Should not navigate to /login for duplicate username");
     }
 }

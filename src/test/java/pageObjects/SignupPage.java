@@ -55,6 +55,14 @@ public class SignupPage {
         btn.click();
     }
 
+    public boolean isSubmitEnabled() {
+        try {
+            return wait.until(ExpectedConditions.visibilityOfElementLocated(submitButton)).isEnabled();
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
     public List<WebElement> getMatErrors() {
         return driver.findElements(matErrors);
     }

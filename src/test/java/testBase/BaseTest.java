@@ -1,10 +1,18 @@
 package testBase;
 
+import com.aventstack.extentreports.ExtentTest;
+import com.aventstack.extentreports.Status;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxOptions;
+import org.openqa.selenium.edge.EdgeDriver;
+import org.openqa.selenium.edge.EdgeOptions;
+import org.openqa.selenium.safari.SafariDriver;
+import org.openqa.selenium.safari.SafariOptions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.ITestResult;
@@ -13,6 +21,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import pageObjects.AppShellPage;
 import pageObjects.LoginPage;
+import utilities.ExtentManager;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -60,22 +69,85 @@ public class BaseTest {
 
     @BeforeMethod(alwaysRun = true)
     public void setUp() {
-        ChromeOptions options = new ChromeOptions();
-        options.addArguments("--remote-allow-origins=*");
-        options.addArguments("--start-maximized");
+        String browser = config != null ? config.getProperty("browser", "chrome").trim().toLowerCase() : "chrome";
+        boolean headless = config != null && Boolean.parseBoolean(config.getProperty("headless", "false").trim());
         Path downloadDir = Paths.get("target", "downloads").toAbsolutePath();
-        Map<String, Object> downloadPreferences = new HashMap<>();
-        downloadPreferences.put("download.default_directory", downloadDir.toString());
-        downloadPreferences.put("download.prompt_for_download", false);
-        downloadPreferences.put("download.directory_upgrade", true);
-        downloadPreferences.put("plugins.always_open_pdf_externally", true);
-        options.setExperimentalOption("prefs", downloadPreferences);
-        // If you need headless runs in CI, add: options.addArguments("--headless=new");
 
-        driver = new ChromeDriver(options);
+        log.info("Initializing WebDriver for browser: {}, headless: {}", browser, headless);
+
+        switch (browser) {
+            case "chrome":
+                ChromeOptions chromeOptions = new ChromeOptions();
+                chromeOptions.addArguments("--remote-allow-origins=*");
+                chromeOptions.addArguments("--start-maximized");
+                if (headless) {
+                    chromeOptions.addArguments("--headless=new");
+                }
+                Map<String, Object> chromePrefs = new HashMap<>();
+                chromePrefs.put("download.default_directory", downloadDir.toString());
+                chromePrefs.put("download.prompt_for_download", false);
+                chromePrefs.put("download.directory_upgrade", true);
+                chromePrefs.put("plugins.always_open_pdf_externally", true);
+                chromeOptions.setExperimentalOption("prefs", chromePrefs);
+                driver = new ChromeDriver(chromeOptions);
+                break;
+
+            case "firefox":
+                FirefoxOptions firefoxOptions = new FirefoxOptions();
+                if (headless) {
+                    firefoxOptions.addArguments("-headless");
+                }
+                firefoxOptions.addPreference("browser.download.folderList", 2);
+                firefoxOptions.addPreference("browser.download.dir", downloadDir.toString());
+                firefoxOptions.addPreference("browser.helperApps.neverAsk.saveToDisk", "application/pdf,application/octet-stream,text/csv");
+                firefoxOptions.addPreference("pdfjs.disabled", true);
+                driver = new FirefoxDriver(firefoxOptions);
+                driver.manage().window().maximize();
+                break;
+
+            case "edge":
+                EdgeOptions edgeOptions = new EdgeOptions();
+                edgeOptions.addArguments("--remote-allow-origins=*");
+                edgeOptions.addArguments("--start-maximized");
+                if (headless) {
+                    edgeOptions.addArguments("--headless=new");
+                }
+                Map<String, Object> edgePrefs = new HashMap<>();
+                edgePrefs.put("download.default_directory", downloadDir.toString());
+                edgePrefs.put("download.prompt_for_download", false);
+                edgePrefs.put("download.directory_upgrade", true);
+                edgePrefs.put("plugins.always_open_pdf_externally", true);
+                edgeOptions.setExperimentalOption("prefs", edgePrefs);
+                driver = new EdgeDriver(edgeOptions);
+                break;
+
+            case "safari":
+                SafariOptions safariOptions = new SafariOptions();
+                driver = new SafariDriver(safariOptions);
+                driver.manage().window().maximize();
+                break;
+
+            default:
+                log.warn("Unsupported browser '{}' specified in config, falling back to Chrome", browser);
+                ChromeOptions defaultOptions = new ChromeOptions();
+                defaultOptions.addArguments("--remote-allow-origins=*");
+                defaultOptions.addArguments("--start-maximized");
+                if (headless) {
+                    defaultOptions.addArguments("--headless=new");
+                }
+                Map<String, Object> defaultPrefs = new HashMap<>();
+                defaultPrefs.put("download.default_directory", downloadDir.toString());
+                defaultPrefs.put("download.prompt_for_download", false);
+                defaultPrefs.put("download.directory_upgrade", true);
+                defaultPrefs.put("plugins.always_open_pdf_externally", true);
+                defaultOptions.setExperimentalOption("prefs", defaultPrefs);
+                driver = new ChromeDriver(defaultOptions);
+                break;
+        }
+
         wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 
-        String url = config != null ? config.getProperty("appURL", "http://localhost:4200") : "http://localhost:4200";
+        String url = config != null ? config.getProperty("appURL", "https://loadtrack-gamma.vercel.app/") : "https://loadtrack-gamma.vercel.app/";
         log.info("Navigating to {}", url);
         driver.get(url);
     }
@@ -167,6 +239,26 @@ public class BaseTest {
             log.warn("Failed to create screenshot: {}", e.getMessage());
             return null;
         }
+    }
+
+    /**
+     * Logs a step message into the current test's ExtentReport node.
+     * Safe to call even if no Extent test is active (no-op in that case).
+     *
+     * @param status  e.g. Status.INFO, Status.PASS, Status.WARNING
+     * @param message Step description
+     */
+    protected void extentLog(Status status, String message) {
+        ExtentTest test = ExtentManager.getTest();
+        if (test != null) {
+            test.log(status, message);
+        }
+        log.info("[{}] {}", status, message);
+    }
+
+    /** Shorthand for {@code extentLog(Status.INFO, message)}. */
+    protected void extentInfo(String message) {
+        extentLog(Status.INFO, message);
     }
 
 }

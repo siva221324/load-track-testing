@@ -1,6 +1,7 @@
 package pageObjects;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -73,8 +74,14 @@ public class DealerPortalPage {
         By filter = By.xpath(
                 "//div[contains(@class,'dealer-dashboard')]//mat-button-toggle[normalize-space(.)='" + label + "']");
         wait.until(ExpectedConditions.elementToBeClickable(filter)).click();
-        wait.until(webDriver -> webDriver.findElements(paymentRow(truckNumber)).stream()
-                .anyMatch(row -> row.getText().contains(expectedStatus)));
+        wait.until(webDriver -> {
+            try {
+                return webDriver.findElements(paymentRow(truckNumber)).stream()
+                        .anyMatch(row -> row.getText().contains(expectedStatus));
+            } catch (StaleElementReferenceException e) {
+                return false;
+            }
+        });
     }
 
     private WebElement waitForPaymentRow(String truckNumber) {

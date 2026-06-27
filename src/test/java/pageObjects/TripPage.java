@@ -1,13 +1,17 @@
 package pageObjects;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
+import org.openqa.selenium.StaleElementReferenceException;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
+import java.time.LocalDate;
 
 /**
  * Page Object for the admin trip-management page and its dialogs.
@@ -111,7 +115,7 @@ public class TripPage {
         selectOption(dealerSelect, dealerName);
         selectOption(sandTypeSelect, sandTypeName);
         replace(tonsInput, tons);
-        replace(tripDateInput, tripDate);
+        enterTripDate(tripDate);
         replace(sourceInput, sourceLocation);
         replace(destinationInput, destinationLocation);
     }
@@ -119,7 +123,7 @@ public class TripPage {
     public void updateTripFields(String tons, String tripDate,
                                  String sourceLocation, String destinationLocation) {
         replace(tonsInput, tons);
-        replace(tripDateInput, tripDate);
+        enterTripDate(tripDate);
         replace(sourceInput, sourceLocation);
         replace(destinationInput, destinationLocation);
     }
@@ -180,15 +184,56 @@ public class TripPage {
 
     private void selectOption(By selectLocator, String visibleText) {
         wait.until(ExpectedConditions.elementToBeClickable(selectLocator)).click();
-        By option = By.xpath("//mat-option[contains(normalize-space(.),'" + visibleText + "')]");
+        By option = By.xpath("//mat-option[contains(normalize-space(.), '" + visibleText + "')]");
         wait.until(ExpectedConditions.elementToBeClickable(option)).click();
     }
 
+    /**
+     * Types a value into a form input with retry on StaleElementReferenceException.
+     * After Angular re-renders (e.g. after date entry), dialog inputs can go stale
+     * between visibilityOfElementLocated() returning and the JS click / sendKeys call.
+     */
     private void replace(By locator, String value) {
-        WebElement input = wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
-        input.click();
-        input.sendKeys(Keys.chord(Keys.CONTROL, "a"));
-        input.sendKeys(value);
+        int attempts = 0;
+        while (true) {
+            try {
+                WebElement input = wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
+                // Use JS click to bypass the floating mat-label that intercepts normal clicks
+                ((JavascriptExecutor) driver).executeScript("arguments[0].click();", input);
+                input.sendKeys(Keys.chord(Keys.CONTROL, "a"));
+                input.sendKeys(value);
+                return;
+            } catch (StaleElementReferenceException e) {
+                if (++attempts >= 3) throw e;
+            }
+        }
+    }
+
+    /**
+     * Enters a date into an HTML5 date input (<input type="date">) using JavaScript.
+     *
+     * While the browser displays the date in local format (e.g., 'dd-mm-yyyy' as shown
+     * in the placeholder), standard HTML5 date inputs strictly require their internal
+     * value property to be in ISO format 'YYYY-MM-DD'. Setting it to 'MM/DD/YYYY'
+     * is rejected by the browser, leaving the field empty and invalid.
+     *
+     * The fix: set the value directly to the ISO date (YYYY-MM-DD) using the native
+     * property setter and dispatch input+change events so Angular form control updates.
+     */
+    private void enterTripDate(String isoDate) {
+        WebElement input = wait.until(ExpectedConditions.visibilityOfElementLocated(tripDateInput));
+
+        // Set value to ISO format (YYYY-MM-DD) and fire input/change events
+        JavascriptExecutor js = (JavascriptExecutor) driver;
+        js.executeScript(
+            "var s=Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype,'value').set;" +
+            "s.call(arguments[0],arguments[1]);" +
+            "arguments[0].dispatchEvent(new Event('input',{bubbles:true}));" +
+            "arguments[0].dispatchEvent(new Event('change',{bubbles:true}));",
+            input, isoDate);
+
+        // TAB off to trigger blur validation
+        input.sendKeys(Keys.TAB);
     }
 
     private boolean isDisplayed(By locator) {
@@ -200,6 +245,6 @@ public class TripPage {
     }
 
     private By tripRow(String truckNumber) {
-        return By.xpath("//table[@mat-table]//tr[.//td[normalize-space()='" + truckNumber + "']]");
+        return By.xpath("//div[contains(@class,'trips-page')]//table[@mat-table]//tr[.//td[normalize-space()='" + truckNumber + "']]");
     }
 }

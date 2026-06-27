@@ -1,7 +1,9 @@
 package pageObjects;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -117,8 +119,14 @@ public class PaymentPage {
     }
 
     public String waitForPaymentStatus(String truckNumber, String status) {
-        wait.until(webDriver -> webDriver.findElements(paymentRow(truckNumber)).stream()
-                .anyMatch(row -> row.getText().contains(status)));
+        wait.until(webDriver -> {
+            try {
+                return webDriver.findElements(paymentRow(truckNumber)).stream()
+                        .anyMatch(row -> row.getText().contains(status));
+            } catch (StaleElementReferenceException e) {
+                return false; // table re-rendered; retry on next poll
+            }
+        });
         return waitForPaymentRow(truckNumber).getText();
     }
 
@@ -134,7 +142,8 @@ public class PaymentPage {
 
     private void replace(By locator, String value) {
         WebElement input = wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
-        input.click();
+        // Use JS click to bypass the floating mat-label that intercepts normal clicks
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", input);
         input.sendKeys(Keys.chord(Keys.CONTROL, "a"));
         input.sendKeys(value);
     }
@@ -148,6 +157,6 @@ public class PaymentPage {
     }
 
     private By paymentRow(String truckNumber) {
-        return By.xpath("//table[@mat-table]//tr[.//td[normalize-space()='" + truckNumber + "']]");
+        return By.xpath("//div[contains(@class,'payments-page')]//table[@mat-table]//tr[.//td[normalize-space()='" + truckNumber + "']]");
     }
 }

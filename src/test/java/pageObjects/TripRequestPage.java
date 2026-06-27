@@ -1,7 +1,10 @@
 package pageObjects;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
+import org.openqa.selenium.StaleElementReferenceException;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -98,7 +101,7 @@ public class TripRequestPage {
         replace(tonsInput, tons);
         replace(sourceInput, source);
         replace(destinationInput, destination);
-        replace(requestedDateInput, requestedDate);
+        enterTripDate(requestedDateInput, requestedDate);
         replace(notesInput, notes);
         wait.until(ExpectedConditions.elementToBeClickable(submitRequestButton)).click();
         waitForDealerRequestRow(sandTypeName);
@@ -124,8 +127,14 @@ public class TripRequestPage {
     }
 
     public String waitForAdminRequestStatus(String dealerName, String status) {
-        wait.until(webDriver -> webDriver.findElements(adminRequestRow(dealerName)).stream()
-                .anyMatch(row -> row.getText().contains(status)));
+        wait.until(webDriver -> {
+            try {
+                return webDriver.findElements(adminRequestRow(dealerName)).stream()
+                        .anyMatch(row -> row.getText().contains(status));
+            } catch (StaleElementReferenceException e) {
+                return false;
+            }
+        });
         return waitForAdminRequestRow(dealerName).getText();
     }
 
@@ -173,7 +182,7 @@ public class TripRequestPage {
                                String tripDate, String adminNotes) {
         selectOption(approveTruckSelect, truckNumber);
         selectOption(approveDriverSelect, driverName);
-        replace(approveDateInput, tripDate);
+        enterTripDate(approveDateInput, tripDate);
         replace(approveNotesInput, adminNotes);
         By approveButton = By.xpath(
                 "//mat-dialog-container//button[contains(normalize-space(.),'Approve & Create Trip')]");
@@ -190,8 +199,14 @@ public class TripRequestPage {
     }
 
     private void waitForDealerRowStatus(String sandTypeName, String status) {
-        wait.until(webDriver -> webDriver.findElements(dealerRequestRow(sandTypeName)).stream()
-                .anyMatch(row -> row.getText().contains(status)));
+        wait.until(webDriver -> {
+            try {
+                return webDriver.findElements(dealerRequestRow(sandTypeName)).stream()
+                        .anyMatch(row -> row.getText().contains(status));
+            } catch (StaleElementReferenceException e) {
+                return false;
+            }
+        });
     }
 
     private void selectOption(By selectLocator, String visibleText) {
@@ -201,10 +216,31 @@ public class TripRequestPage {
     }
 
     private void replace(By locator, String value) {
+        int attempts = 0;
+        while (true) {
+            try {
+                WebElement input = wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
+                // Use JS click to bypass the floating mat-label that intercepts normal clicks
+                ((JavascriptExecutor) driver).executeScript("arguments[0].click();", input);
+                input.sendKeys(Keys.chord(Keys.CONTROL, "a"));
+                input.sendKeys(value);
+                return;
+            } catch (StaleElementReferenceException e) {
+                if (++attempts >= 3) throw e;
+            }
+        }
+    }
+
+    private void enterTripDate(By locator, String isoDate) {
         WebElement input = wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
-        input.click();
-        input.sendKeys(Keys.chord(Keys.CONTROL, "a"));
-        input.sendKeys(value);
+        JavascriptExecutor js = (JavascriptExecutor) driver;
+        js.executeScript(
+            "var s=Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype,'value').set;" +
+            "s.call(arguments[0],arguments[1]);" +
+            "arguments[0].dispatchEvent(new Event('input',{bubbles:true}));" +
+            "arguments[0].dispatchEvent(new Event('change',{bubbles:true}));",
+            input, isoDate);
+        input.sendKeys(Keys.TAB);
     }
 
     private boolean isDisplayed(By locator) {

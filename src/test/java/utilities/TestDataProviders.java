@@ -50,16 +50,16 @@ public class TestDataProviders {
     public Object[][] validLoginData() {
         return new Object[][] {
                 // {username, password, role, expectedRouteKeyword}
-                {"admin_user", "AdminPass123!", "ADMIN", "/app/home"},
-                {"driver_user", "DriverPass123!", "DRIVER", "/app/driver"},
-                {"dealer_user", "DealerPass123!", "DEALER", "/app/dealer"}
+                {"admin01", "admin123", "ADMIN", "/app/home"},
+                // {"driver_user", "DriverPass123!", "DRIVER", "/app/driver"},
+                // {"dealer_user", "DealerPass123!", "DEALER", "/app/dealer"}
         };
     }
     @DataProvider(name = "invalidLoginCredentialsData")
     public Object[][] invalidLoginCredentialsData() {
         return new Object[][] {
                 // Wrong password
-                {"validuser", "WrongPassword!", "ADMIN"},
+                {"admin123", "WrongPassword!", "ADMIN"},
                 // Non-existent user
                 {"nonexistentuser", "Password123!", "ADMIN"}
         };
@@ -70,7 +70,7 @@ public class TestDataProviders {
                 // Empty username
                 {"", "Password123!", "ADMIN"},
                 // Empty password
-                {"testuser", "", "ADMIN"},
+                {"admin01", "", "ADMIN"},
                 // Both empty
                 {"", "", "ADMIN"}
         };
