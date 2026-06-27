@@ -1,6 +1,7 @@
 package testCases;
 import org.openqa.selenium.WebElement;
 import org.testng.Assert;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import pageObjects.LoginPage;
 import testBase.BaseTest;
@@ -11,6 +12,13 @@ import java.util.List;
  * Uses centralized DataProviders from utilities.TestDataProviders.
  */
 public class LoginTests extends BaseTest {
+
+    @BeforeMethod(alwaysRun = true)
+    public void navigateToLoginPage() {
+        String baseUrl = config.getProperty("appURL", "http://localhost:4200");
+        driver.get(baseUrl + "/login");
+    }
+
     @Test(dataProvider = "validLoginData", dataProviderClass = TestDataProviders.class)
     public void testValidLogin(String username, String password, String role, String expectedRoute) throws InterruptedException {
         LoginPage login = new LoginPage(driver);

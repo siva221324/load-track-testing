@@ -1,12 +1,10 @@
 package testCases;
 
-import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import pageObjects.DealerPage;
 import pageObjects.DriverPage;
-import pageObjects.LoginPage;
 import pageObjects.PaymentPage;
 import pageObjects.ReceiptPage;
 import pageObjects.SandTypePage;
@@ -25,25 +23,17 @@ import java.nio.file.Paths;
 /** UI coverage for generating and downloading a payment receipt PDF. */
 public class ReceiptTests extends BaseTest {
 
-    private String baseUrl;
-
     @BeforeMethod(alwaysRun = true)
     public void loginAsAdmin() {
-        baseUrl = config.getProperty("appURL", "http://localhost:4200");
-        driver.get(baseUrl + "/login");
-        LoginPage login = new LoginPage(driver);
-        login.selectRole("ADMIN");
-        login.typeUsername(config.getProperty("adminUsername", "admin"));
-        login.typePassword(config.getProperty("adminPassword", "admin123"));
-        login.clickSignIn();
-        wait.until(ExpectedConditions.urlContains("/app/home"));
+        // Login and land on Dashboard — tests navigate to Payments via sidebar
+        loginAsAdminAndNavigateTo("Payments", "/app/payments");
     }
 
     @Test(dataProvider = "receiptDownloadData", dataProviderClass = TestDataProviders.class)
     public void testDownloadReceiptPdf(TripTestData data) throws Exception {
         createTripAndPayment(data);
 
-        driver.get(baseUrl + "/app/payments");
+        navigateToPage("Payments", "/app/payments");
         PaymentPage payments = new PaymentPage(driver);
         payments.waitUntilLoaded();
         payments.openRecordPaymentDialog(data.truckNumber());
@@ -85,7 +75,7 @@ public class ReceiptTests extends BaseTest {
 
     private void createTripAndPayment(TripTestData data) {
         createPrerequisites(data);
-        driver.get(baseUrl + "/app/trips");
+        navigateToPage("Trips", "/app/trips");
         TripPage trips = new TripPage(driver);
         trips.waitUntilLoaded();
         trips.openCreateDialog();
@@ -96,7 +86,7 @@ public class ReceiptTests extends BaseTest {
     }
 
     private void createPrerequisites(TripTestData data) {
-        driver.get(baseUrl + "/app/trucks");
+        navigateToPage("Trucks", "/app/trucks");
         TruckPage trucks = new TruckPage(driver);
         trucks.waitUntilLoaded();
         trucks.openAddDialog();
@@ -106,7 +96,7 @@ public class ReceiptTests extends BaseTest {
         trucks.search(data.truckNumber());
         trucks.waitForTruckRow(data.truckNumber());
 
-        driver.get(baseUrl + "/app/drivers");
+        navigateToPage("Drivers", "/app/drivers");
         DriverPage drivers = new DriverPage(driver);
         drivers.waitUntilLoaded();
         drivers.openAddDialog();
@@ -116,7 +106,7 @@ public class ReceiptTests extends BaseTest {
         drivers.search(data.driverLicense());
         drivers.waitForDriverRow(data.driverLicense());
 
-        driver.get(baseUrl + "/app/dealers");
+        navigateToPage("Dealers", "/app/dealers");
         DealerPage dealers = new DealerPage(driver);
         dealers.waitUntilLoaded();
         dealers.openAddDialog();
@@ -125,7 +115,7 @@ public class ReceiptTests extends BaseTest {
         dealers.search(data.dealerPhone());
         dealers.waitForDealerRow(data.dealerPhone());
 
-        driver.get(baseUrl + "/app/sand-types");
+        navigateToPage("Sand Types", "/app/sand-types");
         SandTypePage sandTypes = new SandTypePage(driver);
         sandTypes.waitUntilLoaded();
         sandTypes.openAddDialog();
@@ -135,29 +125,29 @@ public class ReceiptTests extends BaseTest {
     }
 
     private void deleteTripAndPrerequisites(TripTestData data) {
-        driver.get(baseUrl + "/app/trips");
+        navigateToPage("Trips", "/app/trips");
         TripPage trips = new TripPage(driver);
         trips.waitUntilLoaded();
         trips.deleteTrip(data.truckNumber());
 
-        driver.get(baseUrl + "/app/drivers");
+        navigateToPage("Drivers", "/app/drivers");
         DriverPage drivers = new DriverPage(driver);
         drivers.waitUntilLoaded();
         drivers.search(data.driverLicense());
         drivers.deleteDriver(data.driverLicense());
 
-        driver.get(baseUrl + "/app/dealers");
+        navigateToPage("Dealers", "/app/dealers");
         DealerPage dealers = new DealerPage(driver);
         dealers.waitUntilLoaded();
         dealers.search(data.dealerPhone());
         dealers.deleteDealer(data.dealerPhone());
 
-        driver.get(baseUrl + "/app/sand-types");
+        navigateToPage("Sand Types", "/app/sand-types");
         SandTypePage sandTypes = new SandTypePage(driver);
         sandTypes.waitUntilLoaded();
         sandTypes.deleteSandType(data.sandTypeName());
 
-        driver.get(baseUrl + "/app/trucks");
+        navigateToPage("Trucks", "/app/trucks");
         TruckPage trucks = new TruckPage(driver);
         trucks.waitUntilLoaded();
         trucks.search(data.truckNumber());

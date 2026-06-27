@@ -4,6 +4,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+import pageObjects.AppShellPage;
 import pageObjects.DealerPage;
 import pageObjects.DealerPortalPage;
 import pageObjects.DriverPage;
@@ -52,7 +53,8 @@ public class DealerPortalTests extends BaseTest {
     public void testDealerPortalPaidPaymentAndStats(TripTestData data) {
         createTripAndPayment(data);
 
-        driver.get(baseUrl + "/app/payments");
+        // Navigate to Payments via sidebar while logged in as admin
+        navigateToPage("Payments", "/app/payments");
         PaymentPage payments = new PaymentPage(driver);
         payments.waitUntilLoaded();
         payments.openRecordPaymentDialog(data.truckNumber());
@@ -74,8 +76,13 @@ public class DealerPortalTests extends BaseTest {
         deleteTripAndPrerequisites(data);
     }
 
+    /**
+     * Opens the dealer portal by clicking the sidebar "My Account" link (DEALER role).
+     * Must be called after loginAsDealer() so the correct sidebar links are visible.
+     */
     private DealerPortalPage openDealerPortal() {
-        driver.get(baseUrl + "/app/dealer");
+        AppShellPage shell = new AppShellPage(driver);
+        shell.navigateTo("My Account", "/app/dealer");
         DealerPortalPage portal = new DealerPortalPage(driver);
         portal.waitUntilLoaded();
         return portal;
@@ -83,7 +90,7 @@ public class DealerPortalTests extends BaseTest {
 
     private void createTripAndPayment(TripTestData data) {
         createPrerequisites(data);
-        driver.get(baseUrl + "/app/trips");
+        navigateToPage("Trips", "/app/trips");
         TripPage trips = new TripPage(driver);
         trips.waitUntilLoaded();
         trips.openCreateDialog();
@@ -94,7 +101,7 @@ public class DealerPortalTests extends BaseTest {
     }
 
     private void createPrerequisites(TripTestData data) {
-        driver.get(baseUrl + "/app/trucks");
+        navigateToPage("Trucks", "/app/trucks");
         TruckPage trucks = new TruckPage(driver);
         trucks.waitUntilLoaded();
         trucks.openAddDialog();
@@ -104,7 +111,7 @@ public class DealerPortalTests extends BaseTest {
         trucks.search(data.truckNumber());
         trucks.waitForTruckRow(data.truckNumber());
 
-        driver.get(baseUrl + "/app/drivers");
+        navigateToPage("Drivers", "/app/drivers");
         DriverPage drivers = new DriverPage(driver);
         drivers.waitUntilLoaded();
         drivers.openAddDialog();
@@ -114,7 +121,7 @@ public class DealerPortalTests extends BaseTest {
         drivers.search(data.driverLicense());
         drivers.waitForDriverRow(data.driverLicense());
 
-        driver.get(baseUrl + "/app/dealers");
+        navigateToPage("Dealers", "/app/dealers");
         DealerPage dealers = new DealerPage(driver);
         dealers.waitUntilLoaded();
         dealers.openAddDialog();
@@ -123,7 +130,7 @@ public class DealerPortalTests extends BaseTest {
         dealers.search(data.dealerPhone());
         dealers.waitForDealerRow(data.dealerPhone());
 
-        driver.get(baseUrl + "/app/sand-types");
+        navigateToPage("Sand Types", "/app/sand-types");
         SandTypePage sandTypes = new SandTypePage(driver);
         sandTypes.waitUntilLoaded();
         sandTypes.openAddDialog();
@@ -133,29 +140,29 @@ public class DealerPortalTests extends BaseTest {
     }
 
     private void deleteTripAndPrerequisites(TripTestData data) {
-        driver.get(baseUrl + "/app/trips");
+        navigateToPage("Trips", "/app/trips");
         TripPage trips = new TripPage(driver);
         trips.waitUntilLoaded();
         trips.deleteTrip(data.truckNumber());
 
-        driver.get(baseUrl + "/app/drivers");
+        navigateToPage("Drivers", "/app/drivers");
         DriverPage drivers = new DriverPage(driver);
         drivers.waitUntilLoaded();
         drivers.search(data.driverLicense());
         drivers.deleteDriver(data.driverLicense());
 
-        driver.get(baseUrl + "/app/dealers");
+        navigateToPage("Dealers", "/app/dealers");
         DealerPage dealers = new DealerPage(driver);
         dealers.waitUntilLoaded();
         dealers.search(data.dealerPhone());
         dealers.deleteDealer(data.dealerPhone());
 
-        driver.get(baseUrl + "/app/sand-types");
+        navigateToPage("Sand Types", "/app/sand-types");
         SandTypePage sandTypes = new SandTypePage(driver);
         sandTypes.waitUntilLoaded();
         sandTypes.deleteSandType(data.sandTypeName());
 
-        driver.get(baseUrl + "/app/trucks");
+        navigateToPage("Trucks", "/app/trucks");
         TruckPage trucks = new TruckPage(driver);
         trucks.waitUntilLoaded();
         trucks.search(data.truckNumber());

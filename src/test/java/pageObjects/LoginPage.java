@@ -22,6 +22,7 @@ public class LoginPage {
     private final By dealerRoleTab = By.xpath("//button[contains(., 'Dealer')]");
     private final By matErrors = By.cssSelector("mat-error");
     private final By forgotPasswordLink = By.xpath("//a[contains(text(), 'Forgot password?')]");
+    private final By signUpLink = By.xpath("//a[@routerLink='/login/signup' or contains(text(),'Create an account')]");
     public LoginPage(WebDriver driver) {
         this.driver = driver;
         this.wait = new WebDriverWait(driver, Duration.ofSeconds(10));
@@ -59,5 +60,16 @@ public class LoginPage {
     public void clickForgotPassword() {
         WebElement link = wait.until(ExpectedConditions.elementToBeClickable(forgotPasswordLink));
         link.click();
+    }
+    public void clickSignUp() {
+        WebElement link = wait.until(ExpectedConditions.elementToBeClickable(signUpLink));
+        link.click();
+    }
+    public boolean isSignUpLinkVisible() {
+        try {
+            return !driver.findElements(signUpLink).isEmpty();
+        } catch (Exception e) {
+            return false;
+        }
     }
 }

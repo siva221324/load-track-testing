@@ -4,6 +4,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+import pageObjects.AppShellPage;
 import pageObjects.DealerPage;
 import pageObjects.DriverPage;
 import pageObjects.LoginPage;
@@ -95,7 +96,7 @@ public class TripRequestTests extends BaseTest {
         Assert.assertTrue(row.contains("APPROVED"), "Admin request was not marked APPROVED");
         Assert.assertTrue(row.contains("Trip #"), "Approved request was not linked to a trip");
 
-        driver.get(baseUrl + "/app/trips");
+        navigateToPage("Trips", "/app/trips");
         TripPage trips = new TripPage(driver);
         trips.waitUntilLoaded();
         trips.deleteTrip(data.truckNumber());
@@ -109,7 +110,7 @@ public class TripRequestTests extends BaseTest {
     }
 
     private void createDealerAndSandType(TripRequestTestData data) {
-        driver.get(baseUrl + "/app/dealers");
+        navigateToPage("Dealers", "/app/dealers");
         DealerPage dealers = new DealerPage(driver);
         dealers.waitUntilLoaded();
         dealers.openAddDialog();
@@ -118,7 +119,7 @@ public class TripRequestTests extends BaseTest {
         dealers.search(data.dealerPhone());
         dealers.waitForDealerRow(data.dealerPhone());
 
-        driver.get(baseUrl + "/app/sand-types");
+        navigateToPage("Sand Types", "/app/sand-types");
         SandTypePage sandTypes = new SandTypePage(driver);
         sandTypes.waitUntilLoaded();
         sandTypes.openAddDialog();
@@ -128,7 +129,7 @@ public class TripRequestTests extends BaseTest {
     }
 
     private void createApprovalPrerequisites(TripRequestTestData data) {
-        driver.get(baseUrl + "/app/trucks");
+        navigateToPage("Trucks", "/app/trucks");
         TruckPage trucks = new TruckPage(driver);
         trucks.waitUntilLoaded();
         trucks.openAddDialog();
@@ -138,7 +139,7 @@ public class TripRequestTests extends BaseTest {
         trucks.search(data.truckNumber());
         trucks.waitForTruckRow(data.truckNumber());
 
-        driver.get(baseUrl + "/app/drivers");
+        navigateToPage("Drivers", "/app/drivers");
         DriverPage drivers = new DriverPage(driver);
         drivers.waitUntilLoaded();
         drivers.openAddDialog();
@@ -152,20 +153,20 @@ public class TripRequestTests extends BaseTest {
     }
 
     private void deleteDealerAndSandType(TripRequestTestData data) {
-        driver.get(baseUrl + "/app/dealers");
+        navigateToPage("Dealers", "/app/dealers");
         DealerPage dealers = new DealerPage(driver);
         dealers.waitUntilLoaded();
         dealers.search(data.dealerPhone());
         dealers.deleteDealer(data.dealerPhone());
 
-        driver.get(baseUrl + "/app/sand-types");
+        navigateToPage("Sand Types", "/app/sand-types");
         SandTypePage sandTypes = new SandTypePage(driver);
         sandTypes.waitUntilLoaded();
         sandTypes.deleteSandType(data.sandTypeName());
     }
 
     private void deleteApprovalPrerequisites(TripRequestTestData data) {
-        driver.get(baseUrl + "/app/drivers");
+        navigateToPage("Drivers", "/app/drivers");
         DriverPage drivers = new DriverPage(driver);
         drivers.waitUntilLoaded();
         drivers.search(data.driverLicense());
@@ -173,7 +174,7 @@ public class TripRequestTests extends BaseTest {
 
         deleteDealerAndSandType(data);
 
-        driver.get(baseUrl + "/app/trucks");
+        navigateToPage("Trucks", "/app/trucks");
         TruckPage trucks = new TruckPage(driver);
         trucks.waitUntilLoaded();
         trucks.search(data.truckNumber());
@@ -201,13 +202,16 @@ public class TripRequestTests extends BaseTest {
     }
 
     private void openAdminRequests() {
-        driver.get(baseUrl + "/app/trip-requests");
+        // Navigate via sidebar "Trip Requests" link (exact label from layout-shell.ts)
+        navigateToPage("Trip Requests", "/app/trip-requests");
         requests = new TripRequestPage(driver);
         requests.waitForAdminPage();
     }
 
     private void openDealerRequests() {
-        driver.get(baseUrl + "/app/dealer-requests");
+        // Navigate via sidebar "Request Trips" link (exact label from layout-shell.ts, DEALER role)
+        AppShellPage shell = new AppShellPage(driver);
+        shell.navigateTo("Request Trips", "/app/dealer-requests");
         requests = new TripRequestPage(driver);
         requests.waitForDealerPage();
     }

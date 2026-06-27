@@ -1,12 +1,10 @@
 package testCases;
 
-import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import pageObjects.DealerPage;
 import pageObjects.DriverPage;
-import pageObjects.LoginPage;
 import pageObjects.SandTypePage;
 import pageObjects.TripPage;
 import pageObjects.TruckPage;
@@ -19,23 +17,13 @@ import utilities.TripTestData;
  */
 public class TripTests extends BaseTest {
 
-    private String baseUrl;
     private TripPage trips;
 
     @BeforeMethod(alwaysRun = true)
     public void loginAsAdminAndOpenTrips() {
-        baseUrl = config.getProperty("appURL", "http://localhost:4200");
-        String username = config.getProperty("adminUsername", "admin");
-        String password = config.getProperty("adminPassword", "admin123");
-
-        driver.get(baseUrl + "/login");
-        LoginPage login = new LoginPage(driver);
-        login.selectRole("ADMIN");
-        login.typeUsername(username);
-        login.typePassword(password);
-        login.clickSignIn();
-        wait.until(ExpectedConditions.urlContains("/app/home"));
-        openTripsPage();
+        loginAsAdminAndNavigateTo("Trips", "/app/trips");
+        trips = new TripPage(driver);
+        trips.waitUntilLoaded();
     }
 
     @Test
@@ -128,7 +116,7 @@ public class TripTests extends BaseTest {
     }
 
     private void createPrerequisites(TripTestData data) {
-        driver.get(baseUrl + "/app/trucks");
+        navigateToPage("Trucks", "/app/trucks");
         TruckPage trucksPage = new TruckPage(driver);
         trucksPage.waitUntilLoaded();
         trucksPage.openAddDialog();
@@ -138,7 +126,7 @@ public class TripTests extends BaseTest {
         trucksPage.search(data.truckNumber());
         trucksPage.waitForTruckRow(data.truckNumber());
 
-        driver.get(baseUrl + "/app/drivers");
+        navigateToPage("Drivers", "/app/drivers");
         DriverPage driversPage = new DriverPage(driver);
         driversPage.waitUntilLoaded();
         driversPage.openAddDialog();
@@ -148,7 +136,7 @@ public class TripTests extends BaseTest {
         driversPage.search(data.driverLicense());
         driversPage.waitForDriverRow(data.driverLicense());
 
-        driver.get(baseUrl + "/app/dealers");
+        navigateToPage("Dealers", "/app/dealers");
         DealerPage dealersPage = new DealerPage(driver);
         dealersPage.waitUntilLoaded();
         dealersPage.openAddDialog();
@@ -157,7 +145,7 @@ public class TripTests extends BaseTest {
         dealersPage.search(data.dealerPhone());
         dealersPage.waitForDealerRow(data.dealerPhone());
 
-        driver.get(baseUrl + "/app/sand-types");
+        navigateToPage("Sand Types", "/app/sand-types");
         SandTypePage sandTypesPage = new SandTypePage(driver);
         sandTypesPage.waitUntilLoaded();
         sandTypesPage.openAddDialog();
@@ -167,24 +155,24 @@ public class TripTests extends BaseTest {
     }
 
     private void deletePrerequisites(TripTestData data) {
-        driver.get(baseUrl + "/app/drivers");
+        navigateToPage("Drivers", "/app/drivers");
         DriverPage driversPage = new DriverPage(driver);
         driversPage.waitUntilLoaded();
         driversPage.search(data.driverLicense());
         driversPage.deleteDriver(data.driverLicense());
 
-        driver.get(baseUrl + "/app/dealers");
+        navigateToPage("Dealers", "/app/dealers");
         DealerPage dealersPage = new DealerPage(driver);
         dealersPage.waitUntilLoaded();
         dealersPage.search(data.dealerPhone());
         dealersPage.deleteDealer(data.dealerPhone());
 
-        driver.get(baseUrl + "/app/sand-types");
+        navigateToPage("Sand Types", "/app/sand-types");
         SandTypePage sandTypesPage = new SandTypePage(driver);
         sandTypesPage.waitUntilLoaded();
         sandTypesPage.deleteSandType(data.sandTypeName());
 
-        driver.get(baseUrl + "/app/trucks");
+        navigateToPage("Trucks", "/app/trucks");
         TruckPage trucksPage = new TruckPage(driver);
         trucksPage.waitUntilLoaded();
         trucksPage.search(data.truckNumber());
@@ -192,7 +180,7 @@ public class TripTests extends BaseTest {
     }
 
     private void openTripsPage() {
-        driver.get(baseUrl + "/app/trips");
+        navigateToPage("Trips", "/app/trips");
         trips = new TripPage(driver);
         trips.waitUntilLoaded();
     }

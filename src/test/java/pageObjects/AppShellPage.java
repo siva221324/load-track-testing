@@ -54,6 +54,17 @@ public class AppShellPage {
         wait.until(ExpectedConditions.elementToBeClickable(link)).click();
     }
 
+    /**
+     * Clicks a sidebar navigation link and waits for the URL to contain the given fragment.
+     *
+     * @param label       Exact sidebar label (e.g. "Trucks", "Sand Types", "My Dashboard")
+     * @param urlFragment URL fragment to wait for (e.g. "/app/trucks")
+     */
+    public void navigateTo(String label, String urlFragment) {
+        clickNavigationLink(label);
+        wait.until(ExpectedConditions.urlContains(urlFragment));
+    }
+
     public void logout() {
         wait.until(ExpectedConditions.elementToBeClickable(logoutButton)).click();
         wait.until(ExpectedConditions.urlContains("/login"));

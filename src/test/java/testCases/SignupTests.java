@@ -1,7 +1,10 @@
 package testCases;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.testng.Assert;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+import pageObjects.LoginPage;
 import pageObjects.SignupPage;
 import testBase.BaseTest;
 import utilities.TestDataProviders;
@@ -11,6 +14,20 @@ import java.util.List;
  * Uses centralized DataProviders from utilities.TestDataProviders.
  */
 public class SignupTests extends BaseTest {
+
+    @BeforeMethod(alwaysRun = true)
+    public void navigateToSignupPage() {
+        String baseUrl = config.getProperty("appURL", "http://localhost:4200");
+        // Start at login page
+        driver.get(baseUrl + "/login");
+        LoginPage login = new LoginPage(driver);
+        // The 'Create an account' link is only visible when ADMIN tab is selected
+        login.selectRole("ADMIN");
+        // Click 'Create an account' to navigate to /login/signup
+        login.clickSignUp();
+        wait.until(ExpectedConditions.urlContains("/login/signup"));
+    }
+
     @Test(dataProvider = "validAdminSignupData", dataProviderClass = TestDataProviders.class)
     public void testValidSignup(String username, String password, String confirm) throws InterruptedException {
         SignupPage signup = new SignupPage(driver);

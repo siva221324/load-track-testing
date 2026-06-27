@@ -11,6 +11,8 @@ import org.testng.ITestResult;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
+import pageObjects.AppShellPage;
+import pageObjects.LoginPage;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -114,6 +116,39 @@ public class BaseTest {
 
     protected void waitForVisibleCss(String css, int seconds) {
         new WebDriverWait(driver, Duration.ofSeconds(seconds)).until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(css)));
+    }
+
+    /**
+     * Logs in as admin via the login page, then navigates to a target page
+     * by clicking the sidebar navigation link — simulating real user flow.
+     *
+     * @param navLabel    Exact sidebar label text (e.g. "Trucks", "Sand Types")
+     * @param urlContains URL fragment to wait for after navigation (e.g. "/app/trucks")
+     */
+    protected void loginAsAdminAndNavigateTo(String navLabel, String urlContains) {
+        String baseUrl = config.getProperty("appURL", "http://localhost:4200");
+        driver.get(baseUrl + "/login");
+        LoginPage login = new LoginPage(driver);
+        login.selectRole("ADMIN");
+        login.typeUsername(config.getProperty("adminUsername", "admin"));
+        login.typePassword(config.getProperty("adminPassword", "admin123"));
+        login.clickSignIn();
+        wait.until(ExpectedConditions.urlContains("/app/home"));
+        AppShellPage shell = new AppShellPage(driver);
+        shell.waitUntilLoaded();
+        shell.navigateTo(navLabel, urlContains);
+    }
+
+    /**
+     * Navigates to a page via the sidebar while already logged in.
+     * Use this inside test helpers when the session is already established.
+     *
+     * @param navLabel    Exact sidebar label text (e.g. "Trips", "Payments")
+     * @param urlContains URL fragment to wait for (e.g. "/app/trips")
+     */
+    protected void navigateToPage(String navLabel, String urlContains) {
+        AppShellPage shell = new AppShellPage(driver);
+        shell.navigateTo(navLabel, urlContains);
     }
 
     protected String takeScreenshot(String name) {

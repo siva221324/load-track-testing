@@ -126,7 +126,7 @@ public class NavigationSecurityTests extends BaseTest {
     }
 
     private void createDriver(TripTestData data) {
-        driver.get(baseUrl + "/app/drivers");
+        navigateToPage("Drivers", "/app/drivers");
         DriverPage drivers = new DriverPage(driver);
         drivers.waitUntilLoaded();
         drivers.openAddDialog();
@@ -138,7 +138,7 @@ public class NavigationSecurityTests extends BaseTest {
     }
 
     private void deleteDriver(TripTestData data) {
-        driver.get(baseUrl + "/app/drivers");
+        navigateToPage("Drivers", "/app/drivers");
         DriverPage drivers = new DriverPage(driver);
         drivers.waitUntilLoaded();
         drivers.search(data.driverLicense());
@@ -146,7 +146,7 @@ public class NavigationSecurityTests extends BaseTest {
     }
 
     private void createDealer(TripTestData data) {
-        driver.get(baseUrl + "/app/dealers");
+        navigateToPage("Dealers", "/app/dealers");
         DealerPage dealers = new DealerPage(driver);
         dealers.waitUntilLoaded();
         dealers.openAddDialog();
@@ -157,7 +157,7 @@ public class NavigationSecurityTests extends BaseTest {
     }
 
     private void deleteDealer(TripTestData data) {
-        driver.get(baseUrl + "/app/dealers");
+        navigateToPage("Dealers", "/app/dealers");
         DealerPage dealers = new DealerPage(driver);
         dealers.waitUntilLoaded();
         dealers.search(data.dealerPhone());

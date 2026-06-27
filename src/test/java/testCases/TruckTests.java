@@ -1,10 +1,8 @@
 package testCases;
 
-import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-import pageObjects.LoginPage;
 import pageObjects.TruckPage;
 import testBase.BaseTest;
 import utilities.TestDataProviders;
@@ -18,19 +16,7 @@ public class TruckTests extends BaseTest {
 
     @BeforeMethod(alwaysRun = true)
     public void loginAsAdminAndOpenTrucks() {
-        String baseUrl = config.getProperty("appURL", "http://localhost:4200");
-        String username = config.getProperty("adminUsername", "admin");
-        String password = config.getProperty("adminPassword", "admin123");
-
-        driver.get(baseUrl + "/login");
-        LoginPage login = new LoginPage(driver);
-        login.selectRole("ADMIN");
-        login.typeUsername(username);
-        login.typePassword(password);
-        login.clickSignIn();
-        wait.until(ExpectedConditions.urlContains("/app/home"));
-
-        driver.get(baseUrl + "/app/trucks");
+        loginAsAdminAndNavigateTo("Trucks", "/app/trucks");
         trucks = new TruckPage(driver);
         trucks.waitUntilLoaded();
     }

@@ -50,7 +50,7 @@ public class ForgotPasswordTests extends BaseTest {
     public void testResetPasswordAndLoginWithTemporaryPassword(
             String name, String phone, String license, String address, String salary) {
         loginAsAdmin();
-        driver.get(baseUrl + "/app/drivers");
+        navigateToPage("Drivers", "/app/drivers");
         DriverPage drivers = new DriverPage(driver);
         drivers.waitUntilLoaded();
         drivers.openAddDialog();
@@ -80,7 +80,7 @@ public class ForgotPasswordTests extends BaseTest {
         wait.until(ExpectedConditions.urlContains("/app/driver"));
 
         loginAsAdmin();
-        driver.get(baseUrl + "/app/drivers");
+        navigateToPage("Drivers", "/app/drivers");
         drivers = new DriverPage(driver);
         drivers.waitUntilLoaded();
         drivers.search(license);
